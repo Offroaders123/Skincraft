@@ -1,0 +1,1 @@
+click and drag layer names to change their position. shift-click to group them.

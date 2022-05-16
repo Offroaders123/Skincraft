@@ -1,0 +1,15 @@
+Save a .TXT file that Skincraft can load to 
+--- RECORDSEPARATOR ---
+allow you to edit your skin again in the 
+--- RECORDSEPARATOR ---
+future!
+--- RECORDSEPARATOR ---
+NOTE:
+--- RECORDSEPARATOR ---
+ Please add the 
+--- RECORDSEPARATOR ---
+.txt
+--- RECORDSEPARATOR ---
+ extension to the 
+--- RECORDSEPARATOR ---
+end of your file when selecting a name.

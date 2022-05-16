@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" height="58.75px" width="240.25px" xmlns="http://www.w3.org/2000/svg">
+  <g transform="matrix(1.0, 0.0, 0.0, 1.0, 119.2, 25.05)">
+    <path d="M110.7 -21.9 Q120.3 -21.9 120.3 -11.15 L120.3 22.2 Q120.3 32.95 110.7 32.95 L-108.85 32.95 Q-118.45 32.95 -118.45 22.2 L-118.45 -11.15 Q-118.45 -21.9 -108.85 -21.9 L110.7 -21.9" fill="#000000" fill-rule="evenodd" stroke="none"/>
+    <path d="M110.7 -21.9 L-108.85 -21.9 Q-118.45 -21.9 -118.45 -11.15 L-118.45 22.2 Q-118.45 32.95 -108.85 32.95 L110.7 32.95 Q120.3 32.95 120.3 22.2 L120.3 -11.15 Q120.3 -21.9 110.7 -21.9 Z" fill="none" stroke="#000000" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+    <path d="M110.7 -24.3 Q120.3 -24.3 120.3 -13.55 L120.3 19.8 Q120.3 30.55 110.7 30.55 L-108.85 30.55 Q-118.45 30.55 -118.45 19.8 L-118.45 -13.55 Q-118.45 -24.3 -108.85 -24.3 L110.7 -24.3" fill="url(#gradient0)" fill-rule="evenodd" stroke="none"/>
+    <path d="M110.7 -24.3 L-108.85 -24.3 Q-118.45 -24.3 -118.45 -13.55 L-118.45 19.8 Q-118.45 30.55 -108.85 30.55 L110.7 30.55 Q120.3 30.55 120.3 19.8 L120.3 -13.55 Q120.3 -24.3 110.7 -24.3 Z" fill="none" stroke="#222222" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+  </g>
+  <defs>
+    <linearGradient gradientTransform="matrix(-2.0E-4, -0.0331, 0.0335, -2.0E-4, 0.85, 3.15)" gradientUnits="userSpaceOnUse" id="gradient0" spreadMethod="pad" x1="-819.2" x2="819.2">
+      <stop offset="0.0" stop-color="#424242"/>
+      <stop offset="1.0" stop-color="#232323"/>
+    </linearGradient>
+  </defs>
+</svg>
