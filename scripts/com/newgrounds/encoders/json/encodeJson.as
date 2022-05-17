@@ -1,6 +1,14 @@
 package com.newgrounds.encoders.json
 {
-   public const encodeJson:Function = initDecodeJson();
+   // public const encodeJson:Function = initDecodeJson();
+   public class encodeJson
+   {
+      public function encodeJson()
+      {
+         super();
+         return initDecodeJson();
+      }
+   }
 }
 
 function initDecodeJson():Function
