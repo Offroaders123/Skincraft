@@ -1,0 +1,8 @@
+{
+  "scripts": {
+    "start": "as3js -src ../flash-source/scripts -o ./compiled.js -d"
+  },
+  "dependencies": {
+    "as3js": "^0.3.3"
+  }
+}
