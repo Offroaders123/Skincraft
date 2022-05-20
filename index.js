@@ -1,30 +1,17 @@
-import fs from "fs/promises";
+import { promises as fs } from "fs";
+import path from "path";
 
-async function run(){
-  for await (const file of getFiles()){
-    const valid = endsWith(file.path,".png",".jpg",".svg");
-    console.log(file.path,valid);
-    if (valid) console.log(file.path);
-  }
-}
-
-async function* getFiles(path = "./"){
-  const entries = await fs.readdir(path,{ withFileTypes: true });
-  for (const file of entries){
-    if (file.isDirectory()){
-      yield* getFiles(`${path}${file.name}/`);
+async function getFilePathsFromDirectory(directoryPath,{ recursive = false } = {}){
+  const filePaths = [];
+  for await (const entry of await fs.readdir(directoryPath,{ withFileTypes: true })){
+    if (entry.isDirectory() && recursive === true){
+      filePaths.push(await getFilePathsFromDirectory(`${directoryPath}${entry.name}/`,{ recursive }));
     } else {
-      yield { ...file, path: `${path}${file.name}` };
+      filePaths.push(path.join(directoryPath,entry.name).split(path.sep).join(path.posix.sep));
     }
   }
+  return (recursive === true) ? filePaths.flat(Infinity) : filePaths;
 }
 
-function endsWith(string,...values){console.log(values);
-  for (const value of values){
-    console.log(value);
-    if (!string.endsWith(value)) return false;
-  }
-  return true;
-}
-
-run();
+const files = await getFilePathsFromDirectory("./",{ recursive: true });
+fs.writeFile("output.json",JSON.stringify(files,null,"  "));
