@@ -1,3 +1,0 @@
-skin must be 64x64 in order to display correctly. 
---- RECORDSEPARATOR ---
-32x64 skins will be converted to 64x64.

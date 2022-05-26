@@ -1,3 +1,0 @@
-Enter any player's username (case sensitive) 
---- RECORDSEPARATOR ---
-and click load

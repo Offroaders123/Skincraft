@@ -1,3 +1,0 @@
-release v 1.06
---- RECORDSEPARATOR ---
-This product is NOT affiliated with Mojang. Minecraft is a trademark of Mojang.
