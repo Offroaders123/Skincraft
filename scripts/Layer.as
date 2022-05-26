@@ -1,138 +1,118 @@
-package
+﻿package
 {
-   import flash.display.BitmapData;
-   import flash.display.BlendMode;
-   import flash.utils.IDataInput;
-   import flash.utils.IDataOutput;
-   import flash.utils.IExternalizable;
-   
-   public class Layer implements IExternalizable
-   {
-      
-      public static const PREMADE:uint = 0;
-      
-      public static const CUSTOM:uint = 1;
-       
-      
-      public var opacity:uint;
-      
-      public var colorIntensity:uint;
-      
-      public var name:String;
-      
-      public var blendMode:String;
-      
-      public var selected:Boolean;
-      
-      public var offsetX:int;
-      
-      public var offsetY:int;
-      
-      public var hidden:Boolean;
-      
-      public var isNew:Boolean;
-      
-      public var tintColor:int;
-      
-      public var type:uint;
-      
-      public var linkedSprite:BitmapSprite;
-      
-      public var flattenColor:Boolean;
-      
-      public var invertX:Boolean;
-      
-      public var invertY:Boolean;
-      
-      public var index:uint;
-      
-      public var textureIntensity:uint;
-      
-      public var blur:uint;
-      
-      public var faded:Boolean;
-      
-      protected var i:int;
-      
-      protected var j:int;
-      
-      public var timeOfLastClick:uint;
-      
-      public function Layer()
+  import flash.display.Bitmap;
+  import flash.display.BitmapData;
+  import flash.display.Sprite;
+  import flash.utils.ByteArray;
+  import flash.net.registerClassAlias;
+  import flash.display.BlendMode;
+  import flash.utils.IExternalizable;
+  import flash.utils.IDataInput;
+  import flash.utils.IDataOutput;
+  
+  public class Layer implements IExternalizable
+  {
+    //instance vars
+    public var name:String;
+    public var type:uint; //premade or custom
+    public var isNew:Boolean; //used to determine the auto scroll after the layer is created
+    public var hidden:Boolean;
+    public var opacity:uint;
+    public var blendMode:String;
+    public var tintColor:int;
+    public var offsetX:int;
+    public var offsetY:int;
+    public var invertX:Boolean;
+    public var invertY:Boolean;
+    public var colorIntensity:uint;
+    public var textureIntensity:uint;
+    public var blur:uint;
+    public var flattenColor:Boolean;
+    public var faded:Boolean; //this doesn't affect the layer, only for the layerbox to show we're dragging the layers
+    public var index:uint; //our position in the layer list collection (used for ranges and moving)
+    public var selected:Boolean; //whether or not our layer box should appear as selected
+    
+    protected var i:int;
+    protected var j:int;
+    
+    public var linkedSprite:BitmapSprite; //the sprite in the preview box that corresponds to this layer
+    public var timeOfLastClick:uint; //used with layer boxes for registering a double click
+    
+    public static const PREMADE:uint = 0;
+    public static const CUSTOM:uint = 1;
+    
+    public function writeExternal(output:IDataOutput):void 
+    {
+      output.writeUTF(name);
+      output.writeBoolean(hidden);
+      output.writeUnsignedInt(opacity);
+      output.writeUTF(blendMode);
+      output.writeInt(tintColor);
+      output.writeInt(offsetX);
+      output.writeInt(offsetY);
+      output.writeBoolean(invertX);
+      output.writeBoolean(invertY);
+      output.writeUnsignedInt(colorIntensity);
+      output.writeUnsignedInt(textureIntensity);
+      output.writeUnsignedInt(blur);
+      output.writeBoolean(flattenColor);
+      output.writeUnsignedInt(index);
+    }
+    
+    public function readExternal(input:IDataInput):void
       {
-         super();
-         this.hidden = false;
-         this.opacity = 100;
-         this.tintColor = ColorGrabber.DEFAULT_COLOR;
-         this.offsetX = this.offsetY = 0;
-         this.invertX = this.invertY = false;
-         this.blendMode = BlendMode.NORMAL;
-         this.timeOfLastClick = 0;
-         this.colorIntensity = 100;
-         this.textureIntensity = 100;
-         this.blur = 0;
-         this.flattenColor = false;
-         this.linkedSprite = null;
+      name = input.readUTF();
+      hidden = input.readBoolean();
+      opacity = input.readUnsignedInt();
+      blendMode = input.readUTF();
+      tintColor = input.readInt();
+      offsetX = input.readInt();
+      offsetY = input.readInt();
+      invertX = input.readBoolean();
+      invertY = input.readBoolean();
+      colorIntensity = input.readUnsignedInt();
+      textureIntensity = input.readUnsignedInt();
+      blur = input.readUnsignedInt();
+      flattenColor = input.readBoolean();
+      index = input.readUnsignedInt();
       }
-      
-      public function readExternal(param1:IDataInput) : void
-      {
-         this.name = param1.readUTF();
-         this.hidden = param1.readBoolean();
-         this.opacity = param1.readUnsignedInt();
-         this.blendMode = param1.readUTF();
-         this.tintColor = param1.readInt();
-         this.offsetX = param1.readInt();
-         this.offsetY = param1.readInt();
-         this.invertX = param1.readBoolean();
-         this.invertY = param1.readBoolean();
-         this.colorIntensity = param1.readUnsignedInt();
-         this.textureIntensity = param1.readUnsignedInt();
-         this.blur = param1.readUnsignedInt();
-         this.flattenColor = param1.readBoolean();
-         this.index = param1.readUnsignedInt();
-      }
-      
-      public function copyBaseProperties(param1:Layer) : *
-      {
-         param1.opacity = this.opacity;
-         param1.tintColor = this.tintColor;
-         param1.offsetX = this.offsetX;
-         param1.offsetY = this.offsetY;
-         param1.invertX = this.invertX;
-         param1.invertY = this.invertY;
-         param1.blendMode = this.blendMode;
-         param1.colorIntensity = this.colorIntensity;
-         param1.textureIntensity = this.textureIntensity;
-         param1.blur = this.blur;
-      }
-      
-      public function writeExternal(param1:IDataOutput) : void
-      {
-         param1.writeUTF(this.name);
-         param1.writeBoolean(this.hidden);
-         param1.writeUnsignedInt(this.opacity);
-         param1.writeUTF(this.blendMode);
-         param1.writeInt(this.tintColor);
-         param1.writeInt(this.offsetX);
-         param1.writeInt(this.offsetY);
-         param1.writeBoolean(this.invertX);
-         param1.writeBoolean(this.invertY);
-         param1.writeUnsignedInt(this.colorIntensity);
-         param1.writeUnsignedInt(this.textureIntensity);
-         param1.writeUnsignedInt(this.blur);
-         param1.writeBoolean(this.flattenColor);
-         param1.writeUnsignedInt(this.index);
-      }
-      
-      public function getBitmapData() : BitmapData
-      {
-         return null;
-      }
-      
-      public function copy() : Layer
-      {
-         return null;
-      }
-   }
+    
+    public function Layer():void
+    {
+      hidden = false;
+      opacity = 100;
+      tintColor = ColorGrabber.DEFAULT_COLOR;
+      offsetX = offsetY = 0;
+      invertX = invertY = false;
+      blendMode = BlendMode.NORMAL;
+      timeOfLastClick = 0;
+      colorIntensity = 100;
+      textureIntensity = 100;
+      blur = 0;
+      flattenColor = false;
+      linkedSprite = null;
+    }
+    
+    //subclasses must implement this
+    public function getBitmapData():BitmapData{return null;}
+    
+    public function copy():Layer
+    {
+      return null;
+    }
+    
+    public function copyBaseProperties(inCopy:Layer)
+    {
+      inCopy.opacity = opacity;
+      inCopy.tintColor = tintColor;
+      inCopy.offsetX = offsetX;
+      inCopy.offsetY = offsetY;
+      inCopy.invertX = invertX;
+      inCopy.invertY = invertY;
+      inCopy.blendMode = blendMode;
+      inCopy.colorIntensity = colorIntensity;
+      inCopy.textureIntensity = textureIntensity;
+      inCopy.blur = blur;
+    }
+  }
 }

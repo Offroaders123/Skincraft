@@ -1,2948 +1,1987 @@
-package
+﻿package
 {
-   import com.newgrounds.API;
-   import com.newgrounds.APIEvent;
-   import com.newgrounds.Medal;
-   import com.newgrounds.SaveFile;
-   import com.newgrounds.SaveQuery;
-   import com.newgrounds.components.APIConnector;
-   import com.newgrounds.components.MedalPopup;
-   import com.newgrounds.components.SaveBrowser;
-   import com.newgrounds.components.VoteBar;
-   import fl.containers.ScrollPane;
-   import fl.controls.CheckBox;
-   import fl.controls.ComboBox;
-   import fl.controls.List;
-   import fl.controls.ScrollPolicy;
-   import fl.controls.Slider;
-   import fl.controls.TextInput;
-   import fl.data.DataProvider;
-   import fl.data.SimpleCollectionItem;
-   import fl.events.ListEvent;
-   import fl.events.SliderEvent;
-   import flash.display.Bitmap;
-   import flash.display.BitmapData;
-   import flash.display.BlendMode;
-   import flash.display.Loader;
-   import flash.display.MovieClip;
-   import flash.display.Sprite;
-   import flash.display.Stage;
-   import flash.events.Event;
-   import flash.events.IOErrorEvent;
-   import flash.events.MouseEvent;
-   import flash.filters.GlowFilter;
-   import flash.geom.Matrix;
-   import flash.geom.Rectangle;
-   import flash.media.Sound;
-   import flash.net.FileFilter;
-   import flash.net.FileReference;
-   import flash.net.URLRequest;
-   import flash.net.registerClassAlias;
-   import flash.text.TextField;
-   import flash.utils.Dictionary;
-   
-   public class Main extends MovieClip
-   {
-      
-      public static const RIGHT:uint = 3;
-      
-      public static var activeDialogBox:DialogBox;
-      
-      public static const LEFT:uint = 2;
-      
-      public static var availableBlendModes:Array;
-      
-      public static var savedBG:uint;
-      
-      public static const TOOL_ERASER:uint = 2;
-      
-      public static var GAME_HEIGHT:uint;
-      
-      public static var GAME_WIDTH:uint;
-      
-      public static var categories:Array;
-      
-      public static var cursorMode:uint;
-      
-      public static const SKIN_HEIGHT:uint = 64;
-      
-      public static var sfxBtnClick:Sound;
-      
-      public static var dragDelayFrames:uint;
-      
-      public static var tempSurface:Surface;
-      
-      public static var preloadNGSaveFile:com.newgrounds.SaveFile;
-      
-      public static var hasSeenAd:Boolean;
-      
-      public static var layerSelection:LayerSelection;
-      
-      public static var dummySkin:Skin;
-      
-      public static var oldSkinRect:Rectangle;
-      
-      public static var pieces:Array;
-      
-      public static var rootRef:Main;
-      
-      public static var subcategories:Array;
-      
-      public static var showAdvancedOptions:Boolean;
-      
-      public static var mirrorMatrix:Matrix;
-      
-      public static const SKIN_WIDTH:uint = 64;
-      
-      public static var surfaces:Vector.<Surface>;
-      
-      public static var i:int;
-      
-      public static var j:int;
-      
-      public static var ngSaveFile:com.newgrounds.SaveFile;
-      
-      public static var layerToDelete:Layer;
-      
-      public static const TOOL_BUCKET:uint = 3;
-      
-      public static var tempPiece:Piece;
-      
-      public static const TOOL_NONE:uint = 0;
-      
-      public static const CURSOR_DRAG:uint = 1;
-      
-      public static var dragStartY:Number;
-      
-      public static const CURSOR_DRAW:uint = 2;
-      
-      public static const TOOL_EYEDROPPER:uint = 4;
-      
-      public static var dragStartX:Number;
-      
-      public static var destinationSurfaces:Vector.<Surface>;
-      
-      public static const MAX_LAYERS:uint = 50;
-      
-      public static var sourceSurfaces:Vector.<Surface>;
-      
-      public static var newDialogBox:DialogBox;
-      
-      public static const UP:uint = 0;
-      
-      public static var tempLayerBox:LayerBox;
-      
-      public static const DOWN:uint = 1;
-      
-      public static var stageRef:Stage;
-      
-      public static const TOOL_PENCIL:uint = 1;
-      
-      public static const CURSOR_FREE:uint = 0;
-      
-      public static var tempSubcategory:Subcategory;
-      
-      public static var savedView:uint;
-      
-      public static var layerToEdit:Layer;
-      
-      public static const MAX_LAYER_NAME_LENGTH:uint = 30;
-      
-      public static var tempLayer:Layer;
-      
-      public static var curSkin:Skin;
-      
-      public static var listenForDrag:Boolean;
-      
-      public static var layerBoxes:Vector.<LayerBox>;
-      
-      public static var sfxBtnHover:Sound;
-      
-      public static var importLimitKB:uint;
-      
-      public static var tempCategory:Category;
-      
-      public static var medalPopup:MedalPopup;
-      
-      public static var tempPresetSkin:PresetSkin;
-      
-      public static var curTool:uint;
-      
-      public static var importLimitBytes:uint;
-      
-      public static var presetSkins:Vector.<PresetSkin>;
-       
-      
-      public var btnBrowse:MovieClip;
-      
-      public var btnEraser:MovieClip;
-      
-      public var btnShowSelection:MovieClip;
-      
-      public var mcPanel:MovieClip;
-      
-      public var sldColorIntensity:Slider;
-      
-      public var importLoader:Loader;
-      
-      public var btnBackToLayers:MovieClip;
-      
-      public var btnDeleteSelection:MovieClip;
-      
-      public var btnAdvancedOptions:MovieClip;
-      
-      public var ngIntro:MovieClip;
-      
-      public var chkShowBase:CheckBox;
-      
-      public var txtSkinName:TextInput;
-      
-      public var sldBlur:Slider;
-      
-      public var importSourceContainer:Sprite;
-      
-      public var txtLoadingSkin:MovieClip;
-      
-      public var txtSurfaceName:TextField;
-      
-      public var btnClearSearch:MovieClip;
-      
-      public var __setPropDict:Dictionary;
-      
-      public var layerHolder:Sprite;
-      
-      public var btnGoPreset:MovieClip;
-      
-      public var sldOpacity:Slider;
-      
-      public var btnSkincraftPack:MovieClip;
-      
-      public var mcLayerDialog:LayerDialog;
-      
-      public var mcLabelBlur:MovieClip;
-      
-      public var btnArrowUp:MovieClip;
-      
-      public var btnPencil:MovieClip;
-      
-      public var btnBackFromBrowse:MovieClip;
-      
-      public var txtColorIntensity:TextField;
-      
-      public var sldTextureIntensity:Slider;
-      
-      public var sourceContainer:Sprite;
-      
-      public var mcMovementExtra:MovieClip;
-      
-      public var btnArrowLeft:MovieClip;
-      
-      public var cmbBlendModes:ComboBox;
-      
-      public var txtOpacityValue:TextField;
-      
-      public var txtBlurValue:TextField;
-      
-      public var savedLayerScrollPosition:Number;
-      
-      public var voteBar:VoteBar;
-      
-      public var __id3_:APIConnector;
-      
-      public var collProps5:Array;
-      
-      public var collProps6:Array;
-      
-      public var collProps7:Array;
-      
-      public var txtLayerCount:TextField;
-      
-      public var mcExportDialog:ExportDialog;
-      
-      public var lstPresets:List;
-      
-      public var saveBrowser:SaveBrowser;
-      
-      public var i5:int;
-      
-      public var i6:int;
-      
-      public var i7:int;
-      
-      public var editorFirstInit:Boolean;
-      
-      public var txtLayerName:TextInput;
-      
-      public var txtMCUsername:TextInput;
-      
-      public var btnBackFromPresets:MovieClip;
-      
-      public var j5;
-      
-      public var j6;
-      
-      public var j7;
-      
-      public var cmbEditorView:ComboBox;
-      
-      public var btnArrowRight:MovieClip;
-      
-      public var mcPreviewBox:PreviewBox;
-      
-      public var pixelEditorMask:Bitmap;
-      
-      public var txtTest:TextField;
-      
-      public var btnSearch:MovieClip;
-      
-      public var btnGoImport:MovieClip;
-      
-      public var collObj5:DataProvider;
-      
-      public var collObj6:DataProvider;
-      
-      public var collObj7:DataProvider;
-      
-      public var mcLabelOpacity:MovieClip;
-      
-      public var btnExport:MovieClip;
-      
-      public var sourceBitmap:Bitmap;
-      
-      public var mcTut1:MovieClip;
-      
-      public var mcTut2:MovieClip;
-      
-      public var mcDirtBG:MovieClip;
-      
-      public var btnImportPNG:MovieClip;
-      
-      public var btnArrowDown:MovieClip;
-      
-      public var btnUndo:MovieClip;
-      
-      public var btnLoad:MovieClip;
-      
-      public var btnBucket:MovieClip;
-      
-      public var mcTankLogo:MovieClip;
-      
-      public var txtDescription:TextField;
-      
-      public var btnHideSelection:MovieClip;
-      
-      public var importSourceBitmap:Bitmap;
-      
-      public var lstLayers:ScrollPane;
-      
-      public var btnPresets:MovieClip;
-      
-      public var btnBackFromEditor:MovieClip;
-      
-      public var mcPreloader:MovieClip;
-      
-      public var chkFlattenColor:CheckBox;
-      
-      public var mcGroupIndicator:MovieClip;
-      
-      public var importFileReference:FileReference;
-      
-      public var btnImportTXT:MovieClip;
-      
-      public var pixelEditor:PixelEditor;
-      
-      public var previewContainer:Sprite;
-      
-      public var txtSpecialMessage:TextField;
-      
-      public var mcToolFollow:MovieClip;
-      
-      public var collProp6:Object;
-      
-      public var collProp7:Object;
-      
-      public var btnBrowseUploads:MovieClip;
-      
-      public var collProp5:Object;
-      
-      public var btnBackFromImport:MovieClip;
-      
-      public var btnAddLayer:MovieClip;
-      
-      public var chkInvertY:CheckBox;
-      
-      public var chkInvertX:CheckBox;
-      
-      public var mcSearchDialog:SearchDialog;
-      
-      public var itemObj5:SimpleCollectionItem;
-      
-      public var itemObj6:SimpleCollectionItem;
-      
-      public var itemObj7:SimpleCollectionItem;
-      
-      public var mcShiftMessage:MovieClip;
-      
-      public var btnCopyLayer:MovieClip;
-      
-      public var txtTextureIntensity:TextField;
-      
-      public var mcNotAvailable:MovieClip;
-      
-      public var colorGrabber:ColorGrabber;
-      
-      public var mcAdvancedLabels:MovieClip;
-      
-      public function Main()
-      {
-         this.__setPropDict = new Dictionary(true);
-         super();
-         addFrameScript(1,this.frame2,4,this.frame5,5,this.frame6,6,this.frame7,7,this.frame8,8,this.frame9,9,this.frame10,10,this.frame11,11,this.frame12,0,this.frame1);
-         stop();
-         rootRef = this;
-         stageRef = stage;
-         GAME_WIDTH = stage.stageWidth;
-         GAME_HEIGHT = stage.stageHeight;
-         importLimitKB = 50;
-         importLimitBytes = importLimitKB * 1024;
-         tabEnabled = tabChildren = false;
-         hasSeenAd = false;
-         savedBG = 1;
-         this.txtLoadingSkin.visible = false;
-         this.mcTankLogo.buttonMode = true;
-         this.mcTankLogo.addEventListener(MouseEvent.CLICK,this.clickTank);
-         Utilities.mc2Btn(this.btnSkincraftPack);
-         this.btnSkincraftPack.addEventListener(MouseEvent.CLICK,this.clickSkincraftPack);
-         var _loc1_:String = loaderInfo.loaderURL;
-         var _loc2_:RegExp = /(kongregate|addictinggames)/i;
-         if(_loc1_.match(_loc2_))
-         {
-            hasSeenAd = true;
-         }
-         registerClassAlias("Skin",Skin);
-         registerClassAlias("Layer",Layer);
-         registerClassAlias("PremadeLayer",PremadeLayer);
-         registerClassAlias("CustomLayer",CustomLayer);
-         registerClassAlias("Piece",Piece);
-         Utilities.setRefs(this,stage);
-         contextMenu = Utilities.generateContextMenu();
-         addChild(Utilities.createOutsideBounds(GAME_WIDTH,GAME_HEIGHT));
-         Utilities.loadSharedObject("SKINCRAFT");
-         this.createPresetSkins();
-         this.createSurfaces();
-         this.createCategories();
-         pieces = new Array();
-         pieces.push(new Piece("Brow 1",Subcategory.FACE,new Array(Surface.HEAD_FRONT,-1),true));
-         pieces.push(new Piece("Brow 2",Subcategory.FACE,new Array(Surface.HEAD_FRONT,-1),true));
-         pieces.push(new Piece("Ears 1",Subcategory.FACE,new Array(Surface.HEAD_LEFT,Surface.HEAD_RIGHT),true));
-         pieces.push(new Piece("Ears 2",Subcategory.FACE,new Array(Surface.HEAD_LEFT,Surface.HEAD_RIGHT),true));
-         pieces.push(new Piece("Ears 3",Subcategory.FACE,new Array(Surface.HEAD_LEFT,Surface.HEAD_RIGHT),true));
-         pieces.push(new Piece("Eyes 1",Subcategory.FACE,new Array(Surface.HEAD_FRONT,-1),true));
-         pieces.push(new Piece("Eyes 2",Subcategory.FACE,new Array(Surface.HEAD_FRONT,-1),true));
-         pieces.push(new Piece("Eyes 3",Subcategory.FACE,new Array(Surface.HEAD_FRONT,-1),true));
-         pieces.push(new Piece("Eyes 4",Subcategory.FACE,new Array(Surface.HEAD_FRONT,-1),true));
-         pieces.push(new Piece("Eyes 5",Subcategory.FACE,new Array(Surface.HEAD_FRONT,-1),true));
-         pieces.push(new Piece("Eyes 6",Subcategory.FACE,new Array(Surface.HEAD_FRONT,-1),true));
-         pieces.push(new Piece("Eyes 7",Subcategory.FACE,new Array(Surface.HEAD_FRONT,-1),true));
-         pieces.push(new Piece("Mouth 1",Subcategory.FACE,new Array(Surface.HEAD_FRONT,-1),true));
-         pieces.push(new Piece("Mouth 2",Subcategory.FACE,new Array(Surface.HEAD_FRONT,-1),true));
-         pieces.push(new Piece("Mouth 3",Subcategory.FACE,new Array(Surface.HEAD_FRONT,-1),true));
-         pieces.push(new Piece("Nose 1",Subcategory.FACE,new Array(Surface.HEAD_FRONT,-1),true));
-         pieces.push(new Piece("Nose 2",Subcategory.FACE,new Array(Surface.HEAD_FRONT,-1),true));
-         pieces.push(new Piece("Nose 3",Subcategory.FACE,new Array(Surface.HEAD_FRONT,-1),true));
-         pieces.push(new Piece("Face 1",Subcategory.FACE,new Array(Surface.HEAD_FRONT,Surface.HEAD_LEFT,Surface.HEAD_RIGHT,Surface.HEAD_BACK),true));
-         pieces.push(new Piece("Face 2",Subcategory.FACE,new Array(Surface.HEAD_FRONT,Surface.HEAD_LEFT,Surface.HEAD_RIGHT,Surface.HEAD_BACK),true));
-         pieces.push(new Piece("Face 3",Subcategory.FACE,new Array(Surface.HEAD_FRONT,Surface.HEAD_LEFT,Surface.HEAD_RIGHT,Surface.HEAD_BACK),true));
-         pieces.push(new Piece("FaceCreeper",Subcategory.FACE,new Array(Surface.HEAD_FRONT,Surface.HEAD_LEFT,Surface.HEAD_RIGHT,Surface.HEAD_BACK),true,"Face 4"));
-         pieces.push(new Piece("Hair Extra 13",Subcategory.FACE,new Array(Surface.HAT_FRONT,-1),true,"Brow 3"));
-         pieces.push(new Piece("Glasses 1",Subcategory.GLASSES,new Array(Surface.HEAD_FRONT,Surface.HEAD_LEFT,Surface.HEAD_RIGHT,Surface.HEAD_BACK),true));
-         pieces.push(new Piece("Glasses 2",Subcategory.GLASSES,new Array(Surface.HEAD_FRONT,Surface.HEAD_LEFT,Surface.HEAD_RIGHT,Surface.HEAD_BACK),true));
-         pieces.push(new Piece("Glasses 3",Subcategory.GLASSES,new Array(Surface.HEAD_FRONT,Surface.HEAD_LEFT,Surface.HEAD_RIGHT,Surface.HEAD_BACK),true,"Eyepatch"));
-         pieces.push(new Piece("Glasses 4",Subcategory.GLASSES,new Array(Surface.HEAD_FRONT,Surface.HEAD_LEFT,Surface.HEAD_RIGHT),true,"Glasses 3"));
-         pieces.push(new Piece("Glasses 5",Subcategory.GLASSES,new Array(Surface.HAT_FRONT,Surface.BODY_FRONT),false,"Monocle"));
-         pieces.push(new Piece("Glasses 6",Subcategory.GLASSES,new Array(Surface.HAT_FRONT,Surface.HAT_LEFT,Surface.HAT_RIGHT),true,"Visor"));
-         pieces.push(new Piece("Hair 1",Subcategory.HAIR,new Array(Surface.HEAD_FRONT,-1),false));
-         pieces.push(new Piece("Hair 2",Subcategory.HAIR,new Array(Surface.HEAD_FRONT,-1),false));
-         pieces.push(new Piece("Hair 3",Subcategory.HAIR,new Array(Surface.HEAD_FRONT,-1),false));
-         pieces.push(new Piece("Hair 4",Subcategory.HAIR,new Array(Surface.HEAD_FRONT,-1),false));
-         pieces.push(new Piece("Hair 5",Subcategory.HAIR,new Array(Surface.HEAD_FRONT,-1),false));
-         pieces.push(new Piece("Hair 6",Subcategory.HAIR,new Array(Surface.HEAD_FRONT,-1),false));
-         pieces.push(new Piece("Hair 7",Subcategory.HAIR,new Array(Surface.HEAD_FRONT,-1),false));
-         pieces.push(new Piece("Hair 8",Subcategory.HAIR,new Array(Surface.HEAD_FRONT,-1),false));
-         pieces.push(new Piece("Hair 9",Subcategory.HAIR,new Array(Surface.HEAD_FRONT,-1),false));
-         pieces.push(new Piece("Hair 10",Subcategory.HAIR,new Array(Surface.HEAD_FRONT,-1),false));
-         pieces.push(new Piece("Hair 11",Subcategory.HAIR,new Array(Surface.HEAD_FRONT,-1),false));
-         pieces.push(new Piece("Hair Extra 1",Subcategory.HAIR,new Array(Surface.HEAD_FRONT,-1),false,"Hair Extra - Ponytail"));
-         pieces.push(new Piece("Hair Extra 2",Subcategory.HAIR,new Array(Surface.HEAD_FRONT,-1),false,"Hair Extra - Bangs"));
-         pieces.push(new Piece("Hair Extra 3",Subcategory.HAIR,new Array(Surface.HEAD_FRONT,-1),false,"Hair Extra - Curl"));
-         pieces.push(new Piece("Hair Extra 4",Subcategory.HAIR,new Array(Surface.HEAD_FRONT,-1),false,"Hair Extra - Chops"));
-         pieces.push(new Piece("Hair Extra 6",Subcategory.HAIR,new Array(Surface.HEAD_FRONT,-1),false,"Hair Extra - Shag"));
-         pieces.push(new Piece("Hair Extra 7",Subcategory.HAIR,new Array(Surface.HEAD_FRONT,-1),false,"Hair Extra - Mohawk"));
-         pieces.push(new Piece("Hair Extra 8",Subcategory.HAIR,new Array(Surface.HEAD_FRONT,-1),false,"Hair Extra - Combover"));
-         pieces.push(new Piece("Hair Extra 9",Subcategory.HAIR,new Array(Surface.HEAD_FRONT,-1),false,"Hair Extra - Homer"));
-         pieces.push(new Piece("Hair Extra 10",Subcategory.HAIR,new Array(Surface.HEAD_FRONT,-1),false,"Hair Extra - Afro"));
-         pieces.push(new Piece("Hair Extra 11",Subcategory.HAIR,new Array(Surface.HEAD_FRONT,-1),false,"Hair Extra - Hippie"));
-         pieces.push(new Piece("Hair Extra 12",Subcategory.HAIR,new Array(Surface.HEAD_FRONT,-1),false,"Hair Extra - Long"));
-         pieces.push(new Piece("Hair Extra 14",Subcategory.HAIR,new Array(Surface.HEAD_FRONT,-1),false,"Hair Extra - Loose"));
-         pieces.push(new Piece("Hair Extra 15",Subcategory.HAIR,new Array(Surface.HEAD_FRONT,-1),false,"Hair Extra - Girly"));
-         pieces.push(new Piece("Hair Extra 16",Subcategory.HAIR,new Array(Surface.HEAD_FRONT,-1),false,"Hair Extra - Emo"));
-         pieces.push(new Piece("Hair Extra 17",Subcategory.HAIR,new Array(Surface.HEAD_FRONT,-1),false,"Hair Extra - Firestarter"));
-         pieces.push(new Piece("Beard 1",Subcategory.HAIR,new Array(Surface.HEAD_FRONT,-1),false));
-         pieces.push(new Piece("Beard 2",Subcategory.HAIR,new Array(Surface.HEAD_FRONT,-1),false));
-         pieces.push(new Piece("Beard 3",Subcategory.HAIR,new Array(Surface.HEAD_FRONT,-1),true,"Mustache 1"));
-         pieces.push(new Piece("Beard 4",Subcategory.HAIR,new Array(Surface.HEAD_FRONT,-1),true,"Mustache 2"));
-         pieces.push(new Piece("Beard 5",Subcategory.HAIR,new Array(Surface.HEAD_FRONT,-1),false,"Beard 3"));
-         pieces.push(new Piece("BeardLong",Subcategory.HAIR,new Array(Surface.HEAD_FRONT,-1),false,"Beard 4"));
-         pieces.push(new Piece("Hair Extra 5",Subcategory.HAIR,new Array(Surface.HAT_FRONT,-1),true,"Mustache 3"));
-         pieces.push(new Piece("HairChest",Subcategory.HAIR,new Array(Surface.BODY_FRONT,-1),false,"Hair Chest"));
-         pieces.push(new Piece("Mask 1",Subcategory.HATS_AND_MASKS,new Array(Surface.HAT_FRONT,Surface.HAT_LEFT,Surface.HAT_RIGHT),true,"Mask - Wolverine"));
-         pieces.push(new Piece("Mask 2",Subcategory.HATS_AND_MASKS,new Array(Surface.HAT_FRONT,Surface.HAT_LEFT,Surface.HAT_RIGHT),true,"Mask - Superhero"));
-         pieces.push(new Piece("Mask 3",Subcategory.HATS_AND_MASKS,new Array(Surface.HEAD_FRONT,-1),false,"Mask - Wrestler"));
-         pieces.push(new Piece("Mask 4",Subcategory.HATS_AND_MASKS,new Array(Surface.HEAD_FRONT,-1),false,"Mask - Ninja"));
-         pieces.push(new Piece("Mask 5",Subcategory.HATS_AND_MASKS,new Array(Surface.HEAD_FRONT,-1),false,"Mask - Samurai"));
-         pieces.push(new Piece("Mask 5b",Subcategory.HATS_AND_MASKS,new Array(Surface.HEAD_FRONT,-1),false,"Helmet - Samurai"));
-         pieces.push(new Piece("Mask 6",Subcategory.HATS_AND_MASKS,new Array(Surface.HAT_FRONT,-1),true,"Mask - Subzero"));
-         pieces.push(new Piece("Mask 7",Subcategory.HATS_AND_MASKS,new Array(Surface.HEAD_FRONT,-1),false,"Mask - Ski"));
-         pieces.push(new Piece("Mask 8",Subcategory.HATS_AND_MASKS,new Array(Surface.HEAD_FRONT,Surface.HEAD_LEFT,Surface.HEAD_RIGHT,Surface.HEAD_BACK),true,"Mask - Ball Gag"));
-         pieces.push(new Piece("Mask 9",Subcategory.HATS_AND_MASKS,new Array(Surface.HEAD_FRONT,-1),false,"Mask - Hockey"));
-         pieces.push(new Piece("Mask 10",Subcategory.HATS_AND_MASKS,new Array(Surface.HAT_FRONT,-1),true,"Mask - Tankman"));
-         pieces.push(new Piece("Mask 11",Subcategory.HATS_AND_MASKS,new Array(Surface.HAT_FRONT,Surface.HAT_LEFT,Surface.HAT_RIGHT),true,"Mask - Minion"));
-         pieces.push(new Piece("Mask 12",Subcategory.HATS_AND_MASKS,new Array(Surface.HAT_FRONT,-1),true,"Mask - Vendetta"));
-         pieces.push(new Piece("Mask 13",Subcategory.HATS_AND_MASKS,new Array(Surface.HAT_FRONT,-1),true,"Mask - Phantom"));
-         pieces.push(new Piece("Hat 1",Subcategory.HATS_AND_MASKS,new Array(Surface.HEAD_FRONT,-1),false,"Hat - Beret"));
-         pieces.push(new Piece("Hat 2",Subcategory.HATS_AND_MASKS,new Array(Surface.HEAD_FRONT,-1),false,"Hat - Jayne Cobb"));
-         pieces.push(new Piece("Hat 3",Subcategory.HATS_AND_MASKS,new Array(Surface.HEAD_FRONT,-1),false,"Helmet - Kettle"));
-         pieces.push(new Piece("Hat 4",Subcategory.HATS_AND_MASKS,new Array(Surface.HEAD_FRONT,-1),false,"Helmet - Crusader"));
-         pieces.push(new Piece("Hat 5",Subcategory.HATS_AND_MASKS,new Array(Surface.HEAD_FRONT,-1),false,"Helmet - Basic"));
-         pieces.push(new Piece("Hat 6",Subcategory.HATS_AND_MASKS,new Array(Surface.HEAD_FRONT,-1),false,"Helmet - Viking"));
-         pieces.push(new Piece("Hat 7",Subcategory.HATS_AND_MASKS,new Array(Surface.HEAD_FRONT,-1),false,"Hat - Kenny Hood"));
-         pieces.push(new Piece("Hat 8",Subcategory.HATS_AND_MASKS,new Array(Surface.HEAD_FRONT,-1),false,"Hat - Yamaka"));
-         pieces.push(new Piece("Hat 9",Subcategory.HATS_AND_MASKS,new Array(Surface.HEAD_FRONT,-1),false,"Helmet - Football"));
-         pieces.push(new Piece("Hat 10",Subcategory.HATS_AND_MASKS,new Array(Surface.HEAD_FRONT,-1),false,"Helmet - Evil Ash"));
-         pieces.push(new Piece("Hat 11",Subcategory.HATS_AND_MASKS,new Array(Surface.HEAD_FRONT,-1),false,"Hat - Bag"));
-         pieces.push(new Piece("Hat 12",Subcategory.HATS_AND_MASKS,new Array(Surface.HEAD_FRONT,-1),false,"Helmet - Astronaut"));
-         pieces.push(new Piece("Hat 12b",Subcategory.HATS_AND_MASKS,new Array(Surface.HEAD_FRONT,-1),false,"Helmet - Astro Visor"));
-         pieces.push(new Piece("Hat 13",Subcategory.HATS_AND_MASKS,new Array(Surface.HEAD_FRONT,-1),false,"Helmet - Miner"));
-         pieces.push(new Piece("Hat 14",Subcategory.HATS_AND_MASKS,new Array(Surface.HEAD_FRONT,-1),false,"Hat - Trucker"));
-         pieces.push(new Piece("Hat 15",Subcategory.HATS_AND_MASKS,new Array(Surface.HEAD_FRONT,-1),false,"Hat - Bandana"));
-         pieces.push(new Piece("Hat 15b",Subcategory.HATS_AND_MASKS,new Array(Surface.HEAD_FRONT,-1),false,"Hat - Bandana Full"));
-         pieces.push(new Piece("Hat 16",Subcategory.HATS_AND_MASKS,new Array(Surface.HEAD_FRONT,-1),false,"Hat - Beret 2"));
-         pieces.push(new Piece("Outline Head",Subcategory.HATS_AND_MASKS,new Array(Surface.HEAD_FRONT,-1),false,"Hat - Outline"));
-         pieces.push(new Piece("Crown1",Subcategory.HATS_AND_MASKS,new Array(Surface.HEAD_FRONT,-1),false,"Hat - Crown 1"));
-         pieces.push(new Piece("Crown2",Subcategory.HATS_AND_MASKS,new Array(Surface.HEAD_FRONT,-1),false,"Hat - Crown 2"));
-         pieces.push(new Piece("LinkCap",Subcategory.HATS_AND_MASKS,new Array(Surface.HEAD_FRONT,-1),false,"Hat - Fairy"));
-         pieces.push(new Piece("PirateHat",Subcategory.HATS_AND_MASKS,new Array(Surface.HEAD_FRONT,-1),false,"Hat - Pirate"));
-         pieces.push(new Piece("WWIIHelmet",Subcategory.HATS_AND_MASKS,new Array(Surface.HEAD_FRONT,-1),false,"Helmet - WWII"));
-         pieces.push(new Piece("Accessory Head 1",Subcategory.ACCESSORY_HEAD,new Array(Surface.HEAD_FRONT,Surface.HEAD_LEFT,Surface.HEAD_RIGHT,Surface.HEAD_BACK),true,"Robot"));
-         pieces.push(new Piece("Accessory Head 2",Subcategory.ACCESSORY_HEAD,new Array(Surface.HEAD_FRONT,-1),false,"Pinhead"));
-         pieces.push(new Piece("Accessory Head 3",Subcategory.ACCESSORY_HEAD,new Array(Surface.HEAD_FRONT,-1),false,"Frankenstein"));
-         pieces.push(new Piece("Accessory Head 4",Subcategory.ACCESSORY_HEAD,new Array(Surface.HEAD_FRONT,-1),false,"Wings"));
-         pieces.push(new Piece("Accessory Head 5",Subcategory.ACCESSORY_HEAD,new Array(Surface.HAT_LEFT,Surface.HAT_RIGHT),true,"Fins"));
-         pieces.push(new Piece("Accessory Head 6",Subcategory.ACCESSORY_HEAD,new Array(Surface.HAT_BACK,-1),true,"Bow"));
-         pieces.push(new Piece("Accessory Head 7",Subcategory.ACCESSORY_HEAD,new Array(Surface.HAT_FRONT,Surface.HAT_LEFT,Surface.HAT_RIGHT,Surface.HAT_BACK),true,"Flower"));
-         pieces.push(new Piece("AfroPick",Subcategory.ACCESSORY_HEAD,new Array(Surface.HAT_FRONT,Surface.HAT_LEFT,Surface.HAT_RIGHT,Surface.HAT_BACK),true,"Afro Pick"));
-         pieces.push(new Piece("Cape 1",Subcategory.CAPES,new Array(Surface.BODY_BACK,-1),false));
-         pieces.push(new Piece("Cape 2",Subcategory.CAPES,new Array(Surface.BODY_BACK,-1),false));
-         pieces.push(new Piece("Cape 3",Subcategory.CAPES,new Array(Surface.BODY_BACK,-1),false));
-         pieces.push(new Piece("HoodCloak",Subcategory.CAPES,new Array(Surface.BODY_FRONT,-1),false,"Cloak 1"));
-         pieces.push(new Piece("WizRobe1",Subcategory.CAPES,new Array(Surface.BODY_FRONT,-1),false,"Wizard 1"));
-         pieces.push(new Piece("WizRobe2",Subcategory.CAPES,new Array(Surface.BODY_FRONT,-1),false,"Wizard 2"));
-         pieces.push(new Piece("WizRobe3",Subcategory.CAPES,new Array(Surface.BODY_FRONT,-1),false,"Wizard 3"));
-         pieces.push(new Piece("Coat 1",Subcategory.COATS,new Array(Surface.BODY_FRONT,-1),false));
-         pieces.push(new Piece("Coat 2",Subcategory.COATS,new Array(Surface.BODY_FRONT,-1),false));
-         pieces.push(new Piece("Coat 2b",Subcategory.COATS,new Array(Surface.BODY_FRONT,-1),false));
-         pieces.push(new Piece("Coat 4",Subcategory.COATS,new Array(Surface.BODY_FRONT,-1),false));
-         pieces.push(new Piece("Coat 4b",Subcategory.COATS,new Array(Surface.BODY_FRONT,-1),false));
-         pieces.push(new Piece("MadMaxCoat",Subcategory.COATS,new Array(Surface.BODY_FRONT,-1),false,"Coat 5"));
-         pieces.push(new Piece("PirateVest",Subcategory.COATS,new Array(Surface.BODY_FRONT,-1),false,"Vest 1"));
-         pieces.push(new Piece("MadMaxVest",Subcategory.COATS,new Array(Surface.BODY_FRONT,-1),false,"Vest 2"));
-         pieces.push(new Piece("Coat 3",Subcategory.COATS,new Array(Surface.BODY_FRONT,-1),false,"Vest 3"));
-         pieces.push(new Piece("Glove 1",Subcategory.GLOVES,new Array(Surface.BODY_FRONT,-1),false));
-         pieces.push(new Piece("Glove 2",Subcategory.GLOVES,new Array(Surface.BODY_FRONT,-1),false));
-         pieces.push(new Piece("Glove 3",Subcategory.GLOVES,new Array(Surface.BODY_FRONT,-1),false));
-         pieces.push(new Piece("Glove 4",Subcategory.GLOVES,new Array(Surface.BODY_FRONT,-1),false));
-         pieces.push(new Piece("Glove 5",Subcategory.GLOVES,new Array(Surface.ARM_RIGHT_BACK,Surface.ARM_RIGHT_LEFT,Surface.ARM_RIGHT_RIGHT,Surface.ARM_RIGHT_FRONT),true));
-         pieces.push(new Piece("Shirt 1",Subcategory.SHIRTS_AND_TIES,new Array(Surface.BODY_FRONT,-1),false));
-         pieces.push(new Piece("Shirt 2",Subcategory.SHIRTS_AND_TIES,new Array(Surface.BODY_FRONT,-1),false));
-         pieces.push(new Piece("Shirt 3",Subcategory.SHIRTS_AND_TIES,new Array(Surface.BODY_FRONT,-1),false));
-         pieces.push(new Piece("Shirt 4",Subcategory.SHIRTS_AND_TIES,new Array(Surface.BODY_FRONT,-1),false));
-         pieces.push(new Piece("Shirt 5",Subcategory.SHIRTS_AND_TIES,new Array(Surface.BODY_FRONT,-1),false));
-         pieces.push(new Piece("Overalls 1",Subcategory.SHIRTS_AND_TIES,new Array(Surface.BODY_FRONT,-1),false));
-         pieces.push(new Piece("Top 1",Subcategory.SHIRTS_AND_TIES,new Array(Surface.BODY_FRONT,-1),false,"Bikini Top 1"));
-         pieces.push(new Piece("Top 2",Subcategory.SHIRTS_AND_TIES,new Array(Surface.BODY_FRONT,-1),false,"Bikini Top 2"));
-         pieces.push(new Piece("PirateShirt",Subcategory.SHIRTS_AND_TIES,new Array(Surface.BODY_FRONT,-1),false,"Shirt 6"));
-         pieces.push(new Piece("Sweater",Subcategory.SHIRTS_AND_TIES,new Array(Surface.BODY_FRONT,-1),false,"Shirt 7"));
-         pieces.push(new Piece("CamoShirt",Subcategory.SHIRTS_AND_TIES,new Array(Surface.BODY_FRONT,-1),false,"Shirt 8"));
-         pieces.push(new Piece("Tunic 1",Subcategory.TUNICS,new Array(Surface.BODY_FRONT,-1),false));
-         pieces.push(new Piece("Tunic 1b",Subcategory.TUNICS,new Array(Surface.BODY_FRONT,-1),false));
-         pieces.push(new Piece("Tunic 2",Subcategory.TUNICS,new Array(Surface.BODY_FRONT,-1),false));
-         pieces.push(new Piece("Tunic 3",Subcategory.TUNICS,new Array(Surface.BODY_FRONT,-1),false,"Armor 1"));
-         pieces.push(new Piece("ArmorChest",Subcategory.TUNICS,new Array(Surface.BODY_FRONT,-1),false,"Armor 2"));
-         pieces.push(new Piece("Belt 1",Subcategory.BELTS,new Array(Surface.BODY_FRONT,-1)));
-         pieces.push(new Piece("Belt 2",Subcategory.BELTS,new Array(Surface.BODY_FRONT,-1)));
-         pieces.push(new Piece("Belt 2b",Subcategory.BELTS,new Array(Surface.BODY_FRONT,-1)));
-         pieces.push(new Piece("Belt 3",Subcategory.BELTS,new Array(Surface.BODY_FRONT,Surface.BODY_LEFT,Surface.BODY_BACK,Surface.BODY_RIGHT),true));
-         pieces.push(new Piece("Belt 3b",Subcategory.BELTS,new Array(Surface.BODY_FRONT,Surface.BODY_LEFT,Surface.BODY_BACK,Surface.BODY_RIGHT),true));
-         pieces.push(new Piece("Belt 4",Subcategory.BELTS,new Array(Surface.BODY_FRONT,-1)));
-         pieces.push(new Piece("Belt 5",Subcategory.BELTS,new Array(Surface.BODY_FRONT,Surface.BODY_LEFT,Surface.BODY_BACK,Surface.BODY_RIGHT),true));
-         pieces.push(new Piece("Belt 6",Subcategory.BELTS,new Array(Surface.BODY_FRONT,-1)));
-         pieces.push(new Piece("Belt 7",Subcategory.BELTS,new Array(Surface.BODY_FRONT,-1)));
-         pieces.push(new Piece("Belt 8",Subcategory.BELTS,new Array(Surface.BODY_FRONT,-1)));
-         pieces.push(new Piece("Belt 9",Subcategory.BELTS,new Array(Surface.BODY_FRONT,-1)));
-         pieces.push(new Piece("Pack 1",Subcategory.PACKS,new Array(Surface.BODY_BACK,-1),false,"Ghostbusters"));
-         pieces.push(new Piece("Pack 2",Subcategory.PACKS,new Array(Surface.BODY_BACK,-1),false,"Backpack"));
-         pieces.push(new Piece("Pack 3",Subcategory.PACKS,new Array(Surface.BODY_BACK,-1),false,"Robot"));
-         pieces.push(new Piece("Symbol 1",Subcategory.SYMBOLS,new Array(Surface.BODY_FRONT,-1),true,"Punisher"));
-         pieces.push(new Piece("Symbol 2",Subcategory.SYMBOLS,new Array(Surface.BODY_FRONT,-1),true,"Superman"));
-         pieces.push(new Piece("Symbol 3",Subcategory.SYMBOLS,new Array(Surface.BODY_FRONT,-1),true,"Batman"));
-         pieces.push(new Piece("Symbol 4",Subcategory.SYMBOLS,new Array(Surface.BODY_FRONT,-1),true,"X-men"));
-         pieces.push(new Piece("Symbol 5",Subcategory.SYMBOLS,new Array(Surface.BODY_FRONT,-1),false,"Ranger 1"));
-         pieces.push(new Piece("Symbol 6",Subcategory.SYMBOLS,new Array(Surface.BODY_FRONT,-1),false,"Ranger 2"));
-         pieces.push(new Piece("Symbol 7",Subcategory.SYMBOLS,new Array(Surface.BODY_FRONT,-1),true,"Bolt"));
-         pieces.push(new Piece("Accessory 1",Subcategory.ACCESSORY_UPPER,new Array(Surface.BODY_FRONT,-1),true,"Tie 1"));
-         pieces.push(new Piece("Accessory 1b",Subcategory.ACCESSORY_UPPER,new Array(Surface.BODY_FRONT,-1),true,"Tie 2"));
-         pieces.push(new Piece("Accessory 1c",Subcategory.ACCESSORY_UPPER,new Array(Surface.BODY_FRONT,-1),true,"Tie 3"));
-         pieces.push(new Piece("Accessory 2",Subcategory.ACCESSORY_UPPER,new Array(Surface.BODY_FRONT,-1),true,"Buckle 1"));
-         pieces.push(new Piece("Accessory 2b",Subcategory.ACCESSORY_UPPER,new Array(Surface.BODY_FRONT,-1),true,"Buckle 2"));
-         pieces.push(new Piece("Accessory 2c",Subcategory.ACCESSORY_UPPER,new Array(Surface.BODY_FRONT,-1),true,"Buckle 3"));
-         pieces.push(new Piece("Accessory 3",Subcategory.ACCESSORY_UPPER,new Array(Surface.BODY_FRONT,-1),true,"Panel"));
-         pieces.push(new Piece("Accessory 4",Subcategory.ACCESSORY_UPPER,new Array(Surface.BODY_FRONT,-1),true,"Badge"));
-         pieces.push(new Piece("Accessory 5",Subcategory.ACCESSORY_UPPER,new Array(Surface.BODY_FRONT,-1),false,"Cowl"));
-         pieces.push(new Piece("Accessory 6",Subcategory.ACCESSORY_UPPER,new Array(Surface.BODY_FRONT,-1),false,"Tie 4"));
-         pieces.push(new Piece("Accessory 7",Subcategory.ACCESSORY_UPPER,new Array(Surface.BODY_BACK,-1),true,"Sword 1"));
-         pieces.push(new Piece("Accessory 8",Subcategory.ACCESSORY_UPPER,new Array(Surface.BODY_BACK,-1),true,"Sword 2"));
-         pieces.push(new Piece("Accessory 9",Subcategory.ACCESSORY_UPPER,new Array(Surface.BODY_BACK,-1),true,"Shield"));
-         pieces.push(new Piece("Accessory 10",Subcategory.ACCESSORY_UPPER,new Array(Surface.BODY_FRONT,-1),false,"Necklace"));
-         pieces.push(new Piece("Accessory Arm 1",Subcategory.ACCESSORY_UPPER,new Array(Surface.ARM_RIGHT_LEFT,Surface.ARM_RIGHT_FRONT,Surface.ARM_RIGHT_RIGHT,Surface.ARM_RIGHT_BACK),true,"Arm - Pads 1"));
-         pieces.push(new Piece("Accessory Arm 2",Subcategory.ACCESSORY_UPPER,new Array(Surface.BODY_FRONT,-1),false,"Arm - Pads 2"));
-         pieces.push(new Piece("Accessory Arm 3",Subcategory.ACCESSORY_UPPER,new Array(Surface.ARM_RIGHT_LEFT,Surface.ARM_RIGHT_FRONT,Surface.ARM_RIGHT_RIGHT,Surface.ARM_RIGHT_BACK),true,"Arm - Bracers"));
-         pieces.push(new Piece("BowserBracers",Subcategory.ACCESSORY_UPPER,new Array(Surface.ARM_RIGHT_LEFT,Surface.ARM_RIGHT_FRONT,Surface.ARM_RIGHT_RIGHT,Surface.ARM_RIGHT_BACK),true,"Arm - Bracers 2"));
-         pieces.push(new Piece("Pants 1",Subcategory.PANTS,new Array(Surface.LEG_RIGHT_FRONT,-1),false));
-         pieces.push(new Piece("Pants 2",Subcategory.PANTS,new Array(Surface.LEG_RIGHT_FRONT,-1),false));
-         pieces.push(new Piece("Pants 3",Subcategory.PANTS,new Array(Surface.LEG_RIGHT_FRONT,-1),false));
-         pieces.push(new Piece("Pants 4",Subcategory.PANTS,new Array(Surface.LEG_RIGHT_FRONT,-1),false));
-         pieces.push(new Piece("Bottom 1",Subcategory.PANTS,new Array(Surface.LEG_RIGHT_FRONT,-1),false,"Bikini Bottom 1"));
-         pieces.push(new Piece("Bottom 2",Subcategory.PANTS,new Array(Surface.LEG_RIGHT_FRONT,-1),false,"Bikini Bottom 2"));
-         pieces.push(new Piece("CamoPants",Subcategory.PANTS,new Array(Surface.LEG_RIGHT_FRONT,-1),false,"Pants 5"));
-         pieces.push(new Piece("Speedo",Subcategory.PANTS,new Array(Surface.LEG_RIGHT_FRONT,-1),false,"Speedo"));
-         pieces.push(new Piece("Shoes 1",Subcategory.SHOES,new Array(Surface.LEG_RIGHT_FRONT,-1),false));
-         pieces.push(new Piece("Shoes 2",Subcategory.SHOES,new Array(Surface.LEG_RIGHT_FRONT,-1),false));
-         pieces.push(new Piece("Shoes 3",Subcategory.SHOES,new Array(Surface.LEG_RIGHT_FRONT,-1),false));
-         pieces.push(new Piece("Hooves",Subcategory.SHOES,new Array(Surface.LEG_RIGHT_FRONT,-1),false));
-         pieces.push(new Piece("Shoes 4",Subcategory.SHOES,new Array(Surface.LEG_RIGHT_FRONT,-1),false));
-         pieces.push(new Piece("Shoes 5",Subcategory.SHOES,new Array(Surface.LEG_RIGHT_FRONT,-1),false));
-         pieces.push(new Piece("Shoes 6",Subcategory.SHOES,new Array(Surface.LEG_RIGHT_FRONT,-1),false));
-         pieces.push(new Piece("Skirt 1",Subcategory.SKIRTS,new Array(Surface.LEG_RIGHT_FRONT,-1),false));
-         pieces.push(new Piece("Skirt 1b",Subcategory.SKIRTS,new Array(Surface.LEG_RIGHT_FRONT,-1),false));
-         pieces.push(new Piece("Skirt 2",Subcategory.SKIRTS,new Array(Surface.LEG_RIGHT_FRONT,-1),false));
-         pieces.push(new Piece("Skirt 3",Subcategory.SKIRTS,new Array(Surface.LEG_RIGHT_FRONT,-1),false));
-         pieces.push(new Piece("Skirt 4",Subcategory.SKIRTS,new Array(Surface.LEG_RIGHT_FRONT,-1),false));
-         pieces.push(new Piece("Accessory Leg 1",Subcategory.ACCESSORY_LOWER,new Array(Surface.LEG_RIGHT_FRONT,-1),false));
-         pieces.push(new Piece("Accessory Leg 2",Subcategory.ACCESSORY_LOWER,new Array(Surface.LEG_RIGHT_FRONT,-1),false));
-         pieces.push(new Piece("Full 1",Subcategory.TEXTURES,new Array(Surface.BODY_FRONT,-1),false,"Rough"));
-         pieces.push(new Piece("Full 2",Subcategory.TEXTURES,new Array(Surface.BODY_FRONT,-1),false,"Outline"));
-         pieces.push(new Piece("Full 3",Subcategory.TEXTURES,new Array(Surface.BODY_FRONT,-1),false,"Muscle"));
-         pieces.push(new Piece("Full 4",Subcategory.TEXTURES,new Array(Surface.BODY_FRONT,-1),false,"Fur"));
-         pieces.push(new Piece("Full 5",Subcategory.TEXTURES,new Array(Surface.BODY_FRONT,-1),false,"Scale"));
-         pieces.push(new Piece("BodyCobble",Subcategory.TEXTURES,new Array(Surface.BODY_FRONT,-1),false,"Cobblestone"));
-         pieces.push(new Piece("BodyDIRT",Subcategory.TEXTURES,new Array(Surface.BODY_FRONT,-1),false,"Dirt"));
-         pieces.push(new Piece("BodyStone",Subcategory.TEXTURES,new Array(Surface.BODY_FRONT,-1),false,"Stone"));
-         pieces.sortOn("name");
-         availableBlendModes = new Array(BlendMode.NORMAL,BlendMode.OVERLAY,BlendMode.MULTIPLY,BlendMode.SCREEN);
-         KeyManager.init();
-         addEventListener(Event.ENTER_FRAME,this.tick);
-         stage.addEventListener(MouseEvent.MOUSE_UP,this.mouseUp);
-         stage.addEventListener(Event.DEACTIVATE,this.gameLoseFocus);
-         savedView = PreviewBox.VIEW_FRONT;
-         medalPopup = new MedalPopup();
-         medalPopup.x = 225;
-         medalPopup.y = 318;
-         addChild(medalPopup);
-         addEventListener(Event.ENTER_FRAME,this.listenForLoad);
-         sfxBtnClick = new button_click();
-         sfxBtnHover = new button_hover();
-         mirrorMatrix = new Matrix();
-         mirrorMatrix.scale(-1,1);
-         mirrorMatrix.translate(4,0);
-         oldSkinRect = new Rectangle(0,0,64,32);
-         sourceSurfaces = new Vector.<Surface>();
-         destinationSurfaces = new Vector.<Surface>();
-         sourceSurfaces.push(getSurface(Surface.LEG_RIGHT_TOP),getSurface(Surface.LEG_RIGHT_BOTTOM),getSurface(Surface.LEG_RIGHT_LEFT),getSurface(Surface.LEG_RIGHT_FRONT),getSurface(Surface.LEG_RIGHT_RIGHT),getSurface(Surface.LEG_RIGHT_BACK),getSurface(Surface.ARM_RIGHT_TOP),getSurface(Surface.ARM_RIGHT_BOTTOM),getSurface(Surface.ARM_RIGHT_LEFT),getSurface(Surface.ARM_RIGHT_FRONT),getSurface(Surface.ARM_RIGHT_RIGHT),getSurface(Surface.ARM_RIGHT_BACK));
-         destinationSurfaces.push(getSurface(Surface.LEG_LEFT_TOP),getSurface(Surface.LEG_LEFT_BOTTOM),getSurface(Surface.LEG_LEFT_RIGHT),getSurface(Surface.LEG_LEFT_FRONT),getSurface(Surface.LEG_LEFT_LEFT),getSurface(Surface.LEG_LEFT_BACK),getSurface(Surface.ARM_LEFT_TOP),getSurface(Surface.ARM_LEFT_BOTTOM),getSurface(Surface.ARM_LEFT_RIGHT),getSurface(Surface.ARM_LEFT_FRONT),getSurface(Surface.ARM_LEFT_LEFT),getSurface(Surface.ARM_LEFT_BACK));
-      }
-      
-      public static function getSubcategory(param1:uint) : Subcategory
-      {
-         for each(tempSubcategory in subcategories)
-         {
-            if(tempSubcategory.id == param1)
-            {
-               return tempSubcategory;
-            }
-         }
-         return null;
-      }
-      
-      public static function getPiece(param1:uint) : Piece
-      {
-         for each(tempPiece in pieces)
-         {
-            if(tempPiece.id == param1)
-            {
-               return tempPiece;
-            }
-         }
-         return null;
-      }
-      
-      public static function getCategory(param1:uint) : Category
-      {
-         for each(tempCategory in categories)
-         {
-            if(tempCategory.id == param1)
-            {
-               return tempCategory;
-            }
-         }
-         return null;
-      }
-      
-      public static function getSurface(param1:uint) : Surface
-      {
-         for each(tempSurface in surfaces)
-         {
-            if(tempSurface.id == param1)
-            {
-               return tempSurface;
-            }
-         }
-         return null;
-      }
-      
-      public static function convertBmpdTo1_8(param1:BitmapData) : BitmapData
-      {
-         var _loc2_:BitmapData = null;
-         var _loc3_:BitmapData = null;
-         var _loc4_:BitmapData = null;
-         var _loc5_:BitmapData = null;
-         var _loc6_:Matrix = null;
-         var _loc7_:Rectangle = null;
-         var _loc8_:Rectangle = null;
-         var _loc9_:uint = 0;
-         if(param1.width == 64 && param1.height == 32)
-         {
-            _loc2_ = new BitmapData(64,64,true,0);
-            _loc2_.copyPixels(param1,oldSkinRect,Box3D.ORIGIN);
-            _loc3_ = new BitmapData(4,12,true,0);
-            _loc4_ = new BitmapData(4,4,true,0);
-            _loc6_ = new Matrix();
-            _loc9_ = 0;
-            while(_loc9_ < sourceSurfaces.length)
-            {
-               _loc7_ = sourceSurfaces[_loc9_].sourceRect;
-               _loc8_ = destinationSurfaces[_loc9_].sourceRect;
-               (_loc5_ = _loc7_.height == 12 ? _loc3_ : _loc4_).copyPixels(param1,_loc7_,Box3D.ORIGIN);
-               _loc6_.identity();
-               _loc6_.scale(-1,1);
-               _loc6_.translate(_loc8_.x + 4,_loc8_.y);
-               _loc2_.draw(_loc5_,_loc6_);
-               _loc9_++;
-            }
-            return _loc2_;
-         }
-         return param1;
-      }
-      
-      public static function generateOKDialog(param1:String, param2:Boolean = false, param3:Boolean = false) : void
-      {
-         newDialogBox = new DialogBox(param1);
-         newDialogBox.createAsOk("",param2,param3);
-         newDialogBox.display();
-      }
-      
-      public static function showDescription(param1:String) : void
-      {
-         rootRef.txtDescription.text = param1;
-      }
-      
-      public static function getPresetSkin(param1:uint) : PresetSkin
-      {
-         for each(tempPresetSkin in presetSkins)
-         {
-            if(tempPresetSkin.id == param1)
-            {
-               return tempPresetSkin;
-            }
-         }
-         return null;
-      }
-      
-      public function changeColorIntensity(param1:Event) : void
-      {
-         layerToEdit.colorIntensity = uint(this.sldColorIntensity.value);
-         this.updateSliderDisplays();
-         this.mcPreviewBox.refreshView();
-      }
-      
-      public function press_btnImportTXT(param1:MouseEvent) : void
-      {
-         this.cleanupMenuMain();
-         gotoAndStop("import_txt","menu");
-      }
-      
-      public function deselectAllLayers() : void
-      {
-         for each(tempLayer in curSkin.layers)
-         {
-            tempLayer.selected = false;
-         }
-      }
-      
-      public function enableImportGo() : void
-      {
-         this.btnGoImport.mouseEnabled = true;
-         this.btnGoImport.alpha = 1;
-      }
-      
-      public function initSharedLayerContent() : void
-      {
-         var _loc1_:String = null;
-         var _loc2_:String = null;
-         this.btnBackToLayers.buttonMode = true;
-         this.btnBackToLayers.addEventListener(MouseEvent.CLICK,this.press_btnBackToLayers);
-         this.btnBackToLayers.addEventListener(MouseEvent.ROLL_OVER,this.genericMouseOver);
-         this.btnBackToLayers.addEventListener(MouseEvent.ROLL_OUT,this.genericMouseOut);
-         this.txtLayerName.text = layerToEdit.name;
-         this.txtLayerName.maxChars = MAX_LAYER_NAME_LENGTH;
-         this.sldOpacity.value = layerToEdit.opacity;
-         this.sldOpacity.addEventListener(Event.CHANGE,this.opacityChange);
-         this.sldBlur.value = layerToEdit.blur;
-         this.sldBlur.addEventListener(SliderEvent.CHANGE,this.changeBlur);
-         i = 0;
-         while(i < availableBlendModes.length)
-         {
-            _loc1_ = availableBlendModes[i];
-            _loc2_ = _loc1_.charAt(0).toUpperCase() + _loc1_.substr(1);
-            this.cmbBlendModes.addItem({
-               "label":_loc2_,
-               "data":_loc1_
-            });
-            if(layerToEdit.blendMode == _loc1_)
-            {
-               this.cmbBlendModes.selectedIndex = i;
-            }
-            ++i;
-         }
-         this.cmbBlendModes.addEventListener(Event.CHANGE,this.changeBlendMode);
-         this.cmbBlendModes.mouseFocusEnabled = false;
-         this.updateSliderDisplays();
-      }
-      
-      public function unlockMedal(param1:String) : void
-      {
-         var _loc2_:Medal = null;
-         var _loc3_:Medal = null;
-      }
-      
-      public function press_btnBackToLayers(param1:MouseEvent) : void
-      {
-         if(this.txtLayerName.text == "")
-         {
-            generateOKDialog("Layer names must be at least one character long");
-            return;
-         }
-         layerToEdit.name = this.txtLayerName.text.substr(0,MAX_LAYER_NAME_LENGTH);
-         if(currentLabel == "edit_custom_layer")
-         {
-            this.pixelEditor.cleanup();
-            removeChild(this.pixelEditor);
-            this.pixelEditor = null;
-            this.mcToolFollow.visible = false;
-            if(this.pixelEditorMask.hasEventListener(Event.ENTER_FRAME))
-            {
-               this.pixelEditorMask.removeEventListener(Event.ENTER_FRAME,this.checkForScroll);
-            }
-            this.pixelEditorMask = null;
-         }
-         this.unloadPreviewBox();
-         gotoAndStop("edit_main");
-      }
-      
-      public function press_btnBrowseUploads(param1:MouseEvent) : void
-      {
-         if(!API.connected)
-         {
-            generateOKDialog("You are not connected to the Newgrounds API");
-            return;
-         }
-         this.cleanupMenuMain();
-         gotoAndStop("browse","menu");
-      }
-      
-      public function mouseUp(param1:MouseEvent) : void
-      {
-         var _loc2_:LayerBox = null;
-         listenForDrag = false;
-         if(cursorMode == CURSOR_DRAG)
-         {
-            _loc2_ = null;
-            for each(tempLayerBox in layerBoxes)
-            {
-               if(tempLayerBox.eligibleForInsertion)
-               {
-                  _loc2_ = tempLayerBox;
-                  break;
-               }
-            }
-            if(_loc2_)
-            {
-               curSkin.moveLayerSelection(_loc2_);
-               this.updateLayers();
-               layerSelection.setRange(layerSelection.range);
-            }
-            this.stopDragLayerSelection();
-         }
-         if(cursorMode == CURSOR_DRAW)
-         {
-            cursorMode = CURSOR_FREE;
-         }
-         if(this.mcShiftMessage)
-         {
-            this.mcShiftMessage.visible = false;
-         }
-      }
-      
-      public function press_btnSearch(param1:MouseEvent) : void
-      {
-         this.mcSearchDialog.show();
-      }
-      
-      public function press_btnExport(param1:MouseEvent) : void
-      {
-         this.mcExportDialog.show();
-      }
-      
-      function __setProp_chkFlattenColor_editor_maincontent_10() : *
-      {
-         try
-         {
-            this.chkFlattenColor["componentInspectorSetting"] = true;
-         }
-         catch(e:Error)
-         {
-         }
-         this.chkFlattenColor.enabled = true;
-         this.chkFlattenColor.label = "";
-         this.chkFlattenColor.labelPlacement = "right";
-         this.chkFlattenColor.selected = false;
-         this.chkFlattenColor.visible = true;
-         try
-         {
-            this.chkFlattenColor["componentInspectorSetting"] = false;
-         }
-         catch(e:Error)
-         {
-         }
-      }
-      
-      public function createCategories() : void
-      {
-         categories = new Array();
-         categories.push(new Category(Category.HEAD,"Head"));
-         categories.push(new Category(Category.UPPER_BODY,"Upper Body"));
-         categories.push(new Category(Category.LOWER_BODY,"Lower Body"));
-         categories.push(new Category(Category.FULL,"Full Character"));
-         subcategories = new Array();
-         subcategories.push(new Subcategory(Subcategory.FACE,"Face",Category.HEAD));
-         subcategories.push(new Subcategory(Subcategory.HAIR,"Hair",Category.HEAD));
-         subcategories.push(new Subcategory(Subcategory.HATS_AND_MASKS,"Hats and Masks",Category.HEAD));
-         subcategories.push(new Subcategory(Subcategory.GLASSES,"Glasses",Category.HEAD));
-         subcategories.push(new Subcategory(Subcategory.ACCESSORY_HEAD,"Accessories",Category.HEAD));
-         subcategories.push(new Subcategory(Subcategory.SHIRTS_AND_TIES,"Shirts and Tops",Category.UPPER_BODY));
-         subcategories.push(new Subcategory(Subcategory.COATS,"Coats",Category.UPPER_BODY));
-         subcategories.push(new Subcategory(Subcategory.GLOVES,"Gloves",Category.UPPER_BODY));
-         subcategories.push(new Subcategory(Subcategory.TUNICS,"Tunics",Category.UPPER_BODY));
-         subcategories.push(new Subcategory(Subcategory.CAPES,"Capes and Cloaks",Category.UPPER_BODY));
-         subcategories.push(new Subcategory(Subcategory.BELTS,"Belts",Category.UPPER_BODY));
-         subcategories.push(new Subcategory(Subcategory.PACKS,"Packs",Category.UPPER_BODY));
-         subcategories.push(new Subcategory(Subcategory.SYMBOLS,"Symbols",Category.UPPER_BODY));
-         subcategories.push(new Subcategory(Subcategory.ACCESSORY_UPPER,"Accessories",Category.UPPER_BODY));
-         subcategories.push(new Subcategory(Subcategory.PANTS,"Pants and Bottoms",Category.LOWER_BODY));
-         subcategories.push(new Subcategory(Subcategory.SHOES,"Shoes",Category.LOWER_BODY));
-         subcategories.push(new Subcategory(Subcategory.SKIRTS,"Skirts",Category.LOWER_BODY));
-         subcategories.push(new Subcategory(Subcategory.ACCESSORY_LOWER,"Accessories",Category.LOWER_BODY));
-         subcategories.push(new Subcategory(Subcategory.TEXTURES,"Textures",Category.FULL));
-      }
-      
-      public function voteComplete(param1:APIEvent) : *
-      {
-         if(param1.success)
-         {
-            this.unlockMedal("Passing Judgement");
-         }
-         else
-         {
-            generateOKDialog("You have already voted on this skin today");
-         }
-      }
-      
-      public function press_btnTool(param1:MouseEvent) : void
-      {
-         this.dehighlightTools();
-         this.changeTool(uint(param1.currentTarget.toolID));
-         param1.currentTarget.mcHighlight.visible = true;
-      }
-      
-      public function changeBlur(param1:Event) : void
-      {
-         layerToEdit.blur = uint(this.sldBlur.value);
-         this.updateSliderDisplays();
-         this.mcPreviewBox.refreshView();
-      }
-      
-      function frame10() : *
-      {
-         if(this.__setPropDict[this.lstLayers] == undefined || int(this.__setPropDict[this.lstLayers]) != 10)
-         {
-            this.__setPropDict[this.lstLayers] = 10;
-            this.__setProp_lstLayers_editor_maincontent_9();
-         }
-         this.initEditor();
-      }
-      
-      function frame11() : *
-      {
-         if(this.__setPropDict[this.sldBlur] == undefined || int(this.__setPropDict[this.sldBlur]) != 11)
-         {
-            this.__setPropDict[this.sldBlur] = 11;
-            this.__setProp_sldBlur_editor_maincontent_10();
-         }
-         if(this.__setPropDict[this.sldTextureIntensity] == undefined || int(this.__setPropDict[this.sldTextureIntensity]) != 11)
-         {
-            this.__setPropDict[this.sldTextureIntensity] = 11;
-            this.__setProp_sldTextureIntensity_editor_maincontent_10();
-         }
-         if(this.__setPropDict[this.sldColorIntensity] == undefined || int(this.__setPropDict[this.sldColorIntensity]) != 11)
-         {
-            this.__setPropDict[this.sldColorIntensity] = 11;
-            this.__setProp_sldColorIntensity_editor_maincontent_10();
-         }
-         if(this.__setPropDict[this.chkFlattenColor] == undefined || int(this.__setPropDict[this.chkFlattenColor]) != 11)
-         {
-            this.__setPropDict[this.chkFlattenColor] = 11;
-            this.__setProp_chkFlattenColor_editor_maincontent_10();
-         }
-         if(this.__setPropDict[this.cmbBlendModes] == undefined || int(this.__setPropDict[this.cmbBlendModes]) != 11)
-         {
-            this.__setPropDict[this.cmbBlendModes] = 11;
-            this.__setProp_cmbBlendModes_editor_maincontent_10();
-         }
-         if(this.__setPropDict[this.chkInvertY] == undefined || int(this.__setPropDict[this.chkInvertY]) != 11)
-         {
-            this.__setPropDict[this.chkInvertY] = 11;
-            this.__setProp_chkInvertY_editor_maincontent_10();
-         }
-         if(this.__setPropDict[this.chkInvertX] == undefined || int(this.__setPropDict[this.chkInvertX]) != 11)
-         {
-            this.__setPropDict[this.chkInvertX] = 11;
-            this.__setProp_chkInvertX_editor_maincontent_10();
-         }
-         if(this.__setPropDict[this.sldOpacity] == undefined || int(this.__setPropDict[this.sldOpacity]) != 11)
-         {
-            this.__setPropDict[this.sldOpacity] = 11;
-            this.__setProp_sldOpacity_editor_maincontent_10();
-         }
-         this.initLayerEditor();
-      }
-      
-      function frame12() : *
-      {
-         if(this.__setPropDict[this.sldBlur] == undefined || int(this.__setPropDict[this.sldBlur]) != 12)
-         {
-            this.__setPropDict[this.sldBlur] = 12;
-            this.__setProp_sldBlur_editor_maincontent_11();
-         }
-         if(this.__setPropDict[this.cmbBlendModes] == undefined || int(this.__setPropDict[this.cmbBlendModes]) != 12)
-         {
-            this.__setPropDict[this.cmbBlendModes] = 12;
-            this.__setProp_cmbBlendModes_editor_maincontent_11();
-         }
-         if(this.__setPropDict[this.cmbEditorView] == undefined || int(this.__setPropDict[this.cmbEditorView]) != 12)
-         {
-            this.__setPropDict[this.cmbEditorView] = 12;
-            this.__setProp_cmbEditorView_editor_maincontent_11();
-         }
-         if(this.__setPropDict[this.chkShowBase] == undefined || int(this.__setPropDict[this.chkShowBase]) != 12)
-         {
-            this.__setPropDict[this.chkShowBase] = 12;
-            this.__setProp_chkShowBase_editor_maincontent_11();
-         }
-         if(this.__setPropDict[this.sldOpacity] == undefined || int(this.__setPropDict[this.sldOpacity]) != 12)
-         {
-            this.__setPropDict[this.sldOpacity] = 12;
-            this.__setProp_sldOpacity_editor_maincontent_11();
-         }
-         this.initCustomLayerEditor();
-      }
-      
-      public function rollOutDeleteSelection(param1:MouseEvent) : void
-      {
-         showDescription("");
-      }
-      
-      public function transitionToMenu() : void
-      {
-         gotoAndStop("main","menu");
-      }
-      
-      function __setProp_chkInvertY_editor_maincontent_10() : *
-      {
-         try
-         {
-            this.chkInvertY["componentInspectorSetting"] = true;
-         }
-         catch(e:Error)
-         {
-         }
-         this.chkInvertY.enabled = true;
-         this.chkInvertY.label = "";
-         this.chkInvertY.labelPlacement = "right";
-         this.chkInvertY.selected = false;
-         this.chkInvertY.visible = true;
-         try
-         {
-            this.chkInvertY["componentInspectorSetting"] = false;
-         }
-         catch(e:Error)
-         {
-         }
-      }
-      
-      public function dehighlightTools() : void
-      {
-         this.btnPencil.mcHighlight.visible = this.btnEraser.mcHighlight.visible = this.btnBucket.mcHighlight.visible = false;
-      }
-      
-      public function press_btnCopyLayer(param1:MouseEvent) : void
-      {
-         if(!layerSelection)
-         {
-            return;
-         }
-         if(layerSelection.layers.length > 1)
-         {
-            generateOKDialog("only one layer can be copied at a time");
-            return;
-         }
-         if(curSkin.layers.length == MAX_LAYERS)
-         {
-            generateOKDialog("You cannot exceed " + MAX_LAYERS + " layers");
-            return;
-         }
-         var _loc2_:String = new String("[copy]" + layerSelection.layers[0].name).substr(0,MAX_LAYER_NAME_LENGTH);
-         var _loc3_:Layer = layerSelection.layers[0];
-         var _loc4_:Layer;
-         (_loc4_ = _loc3_.copy()).name = _loc2_;
-         this.deselectAllLayers();
-         curSkin.addLayer(_loc4_);
-         layerSelection = new LayerSelection(_loc4_,0);
-         this.updateLayers();
-      }
-      
-      function __setProp___id3__loader_main_0() : *
-      {
-         try
-         {
-            this.__id3_["componentInspectorSetting"] = true;
-         }
-         catch(e:Error)
-         {
-         }
-         this.__id3_.apiId = "17500:7T83u8oj";
-         this.__id3_.encryptionKey = "vD9dfdOksou4zWbkhx9vOYqGpoKmh01V";
-         this.__id3_.debugMode = "Off";
-         this.__id3_.movieVersion = "";
-         this.__id3_.connectorType = "Invisible";
-         try
-         {
-            this.__id3_["componentInspectorSetting"] = false;
-         }
-         catch(e:Error)
-         {
-         }
-      }
-      
-      function __setProp_lstLayers_editor_maincontent_9() : *
-      {
-         try
-         {
-            this.lstLayers["componentInspectorSetting"] = true;
-         }
-         catch(e:Error)
-         {
-         }
-         this.lstLayers.enabled = true;
-         this.lstLayers.horizontalLineScrollSize = 4;
-         this.lstLayers.horizontalPageScrollSize = 0;
-         this.lstLayers.horizontalScrollPolicy = "off";
-         this.lstLayers.scrollDrag = false;
-         this.lstLayers.source = "";
-         this.lstLayers.verticalLineScrollSize = 4;
-         this.lstLayers.verticalPageScrollSize = 0;
-         this.lstLayers.verticalScrollPolicy = "on";
-         this.lstLayers.visible = true;
-         try
-         {
-            this.lstLayers["componentInspectorSetting"] = false;
-         }
-         catch(e:Error)
-         {
-         }
-      }
-      
-      public function createPresetSkins() : void
-      {
-         presetSkins = new Vector.<PresetSkin>();
-         presetSkins.push(new PresetSkin(0,"Blank"));
-         presetSkins.push(new PresetSkin(1,"Steve"));
-         presetSkins.push(new PresetSkin(2,"Skin 1"));
-         presetSkins.push(new PresetSkin(3,"Skin 2"));
-         presetSkins.push(new PresetSkin(4,"Skin 3"));
-         presetSkins.push(new PresetSkin(5,"Robot"));
-      }
-      
-      function frame2() : *
-      {
-         if(this.__setPropDict[this.__id3_] == undefined || !(int(this.__setPropDict[this.__id3_]) >= 1 && int(this.__setPropDict[this.__id3_]) <= 2))
-         {
-            this.__setPropDict[this.__id3_] = currentFrame;
-            this.__setProp___id3__loader_main_0();
-         }
-         this.finishLoadScreen();
-      }
-      
-      public function loadPreviewBox(param1:int, param2:int, param3:Number = 1) : void
-      {
-         this.mcPreviewBox = new PreviewBox();
-         this.mcPreviewBox.x = param1;
-         this.mcPreviewBox.y = param2;
-         this.mcPreviewBox.scaleX = this.mcPreviewBox.scaleY = param3;
-         if(curSkin)
-         {
-            this.mcPreviewBox.skin = curSkin;
-            this.mcPreviewBox.loadBase(curSkin.baseBitmapData);
-            this.mcPreviewBox.refreshView();
-         }
-         if(currentLabel == "edit_custom_layer")
-         {
-            addChildAt(this.mcPreviewBox,getChildIndex(this.mcPanel) + 1);
-         }
-         else
-         {
-            addChildAt(this.mcPreviewBox,getChildIndex(this.mcDirtBG) + 1);
-         }
-      }
-      
-      public function changeChkShowBase(param1:Event) : void
-      {
-         stage.focus = null;
-         if(this.chkShowBase.selected)
-         {
-            this.pixelEditor.showBase();
-         }
-         else
-         {
-            this.pixelEditor.hideBase();
-         }
-      }
-      
-      public function press_btnGoPreset(param1:MouseEvent) : void
-      {
-         curSkin = new Skin();
-         curSkin.baseBitmapData = this.mcPreviewBox.sourceBitmapData.clone();
-         this.editorFirstInit = true;
-         this.cleanupMenuPresets();
-         sfxBtnClick.play();
-         gotoAndStop("edit_main","editor");
-      }
-      
-      public function rollOutHideSelection(param1:MouseEvent) : void
-      {
-         showDescription("");
-      }
-      
-      function frame8() : *
-      {
-         this.initMenuImportTXT();
-      }
-      
-      function frame9() : *
-      {
-         if(this.__setPropDict[this.voteBar] == undefined || int(this.__setPropDict[this.voteBar]) != 9)
-         {
-            this.__setPropDict[this.voteBar] = 9;
-            this.__setProp_voteBar_menu_Layer1_8();
-         }
-         if(this.__setPropDict[this.saveBrowser] == undefined || int(this.__setPropDict[this.saveBrowser]) != 9)
-         {
-            this.__setPropDict[this.saveBrowser] = 9;
-            this.__setProp_saveBrowser_menu_Layer1_8();
-         }
-         this.initMenuBrowse();
-      }
-      
-      public function initMenuImportPNG() : void
-      {
-         this.btnGoImport.buttonMode = true;
-         this.btnGoImport.addEventListener(MouseEvent.CLICK,this.press_btnGoImport);
-         this.disableImportGo();
-         this.btnBackFromImport.buttonMode = true;
-         this.btnBackFromImport.addEventListener(MouseEvent.CLICK,this.press_btnBackFromImport);
-         this.btnBrowse.addEventListener(MouseEvent.CLICK,this.press_btnBrowse);
-         this.btnBrowse.buttonMode = true;
-         this.importFileReference = new FileReference();
-         this.importFileReference.addEventListener(Event.SELECT,this.referenceBrowse);
-         this.importFileReference.addEventListener(Event.COMPLETE,this.referenceLoaded);
-         this.importFileReference.addEventListener(IOErrorEvent.IO_ERROR,this.ioError);
-         this.btnLoad.addEventListener(MouseEvent.CLICK,this.press_btnLoad);
-         this.btnLoad.buttonMode = true;
-         this.importLoader = new Loader();
-         this.importLoader.contentLoaderInfo.addEventListener(Event.COMPLETE,this.fileLoaded);
-         this.importLoader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR,this.ioError);
-         this.importLoader.addEventListener(IOErrorEvent.IO_ERROR,this.ioError);
-      }
-      
-      function frame5() : *
-      {
-         this.initMenuMain();
-      }
-      
-      function frame6() : *
-      {
-         this.initMenuPresets();
-      }
-      
-      function frame7() : *
-      {
-         this.initMenuImportPNG();
-      }
-      
-      public function cleanupMenuMain() : void
-      {
-         this.mcTankLogo.removeEventListener(MouseEvent.CLICK,this.clickTank);
-         this.btnPresets.removeEventListener(MouseEvent.CLICK,this.press_btnPresets);
-         this.btnImportPNG.removeEventListener(MouseEvent.CLICK,this.press_btnImportPNG);
-         this.btnImportTXT.removeEventListener(MouseEvent.CLICK,this.press_btnImportTXT);
-         Utilities.cleanupMCBtn(this.btnPresets);
-         Utilities.cleanupMCBtn(this.btnImportPNG);
-         Utilities.cleanupMCBtn(this.btnImportTXT);
-         Utilities.cleanupMCBtn(this.btnBrowseUploads);
-      }
-      
-      public function press_btnBackFromEditor(param1:MouseEvent) : void
-      {
-         Main.newDialogBox = new DialogBox("Are you sure you want to return to the menu? Unsaved progress will be lost");
-         Main.newDialogBox.createAsYesNo("BACKTOMENU");
-         Main.newDialogBox.display();
-      }
-      
-      function frame1() : *
-      {
-         if(this.__setPropDict[this.__id3_] == undefined || !(int(this.__setPropDict[this.__id3_]) >= 1 && int(this.__setPropDict[this.__id3_]) <= 2))
-         {
-            this.__setPropDict[this.__id3_] = currentFrame;
-            this.__setProp___id3__loader_main_0();
-         }
-      }
-      
-      public function press_btnBackFromPresets(param1:MouseEvent) : void
-      {
-         this.cleanupMenuPresets();
-         gotoAndStop("main","menu");
-      }
-      
-      function __setProp_sldOpacity_editor_maincontent_10() : *
-      {
-         try
-         {
-            this.sldOpacity["componentInspectorSetting"] = true;
-         }
-         catch(e:Error)
-         {
-         }
-         this.sldOpacity.direction = "horizontal";
-         this.sldOpacity.enabled = true;
-         this.sldOpacity.liveDragging = true;
-         this.sldOpacity.maximum = 100;
-         this.sldOpacity.minimum = 0;
-         this.sldOpacity.snapInterval = 0;
-         this.sldOpacity.tickInterval = 0;
-         this.sldOpacity.value = 0;
-         this.sldOpacity.visible = true;
-         try
-         {
-            this.sldOpacity["componentInspectorSetting"] = false;
-         }
-         catch(e:Error)
-         {
-         }
-      }
-      
-      function __setProp_sldOpacity_editor_maincontent_11() : *
-      {
-         try
-         {
-            this.sldOpacity["componentInspectorSetting"] = true;
-         }
-         catch(e:Error)
-         {
-         }
-         this.sldOpacity.direction = "horizontal";
-         this.sldOpacity.enabled = true;
-         this.sldOpacity.liveDragging = true;
-         this.sldOpacity.maximum = 100;
-         this.sldOpacity.minimum = 0;
-         this.sldOpacity.snapInterval = 0;
-         this.sldOpacity.tickInterval = 0;
-         this.sldOpacity.value = 0;
-         this.sldOpacity.visible = true;
-         try
-         {
-            this.sldOpacity["componentInspectorSetting"] = false;
-         }
-         catch(e:Error)
-         {
-         }
-      }
-      
-      public function disableImportGo() : void
-      {
-         this.btnGoImport.mouseEnabled = false;
-         this.btnGoImport.alpha = 0.2;
-      }
-      
-      public function press_btnShowSelection(param1:MouseEvent) : void
-      {
-         if(layerSelection == null)
-         {
-            return;
-         }
-         var _loc2_:Boolean = false;
-         for each(tempLayer in layerSelection.layers)
-         {
-            if(tempLayer.hidden)
-            {
-               _loc2_ = true;
-               break;
-            }
-         }
-         if(_loc2_)
-         {
-            for each(tempLayer in layerSelection.layers)
-            {
-               tempLayer.hidden = false;
-            }
-         }
-         else
-         {
-            for each(tempLayer in layerSelection.layers)
-            {
-               tempLayer.hidden = true;
-            }
-         }
-         this.updateLayers();
-      }
-      
-      public function createSurfaces() : void
-      {
-         surfaces = new Vector.<Surface>();
-         surfaces.push(new Surface(Surface.HEAD_LEFT,"Head Left",new Rectangle(0,8,8,8),PreviewBox.VIEW_LEFT));
-         surfaces.push(new Surface(Surface.HEAD_FRONT,"Head Front",new Rectangle(8,8,8,8),PreviewBox.VIEW_FRONT));
-         surfaces.push(new Surface(Surface.HEAD_RIGHT,"Head Right",new Rectangle(16,8,8,8),PreviewBox.VIEW_RIGHT));
-         surfaces.push(new Surface(Surface.HEAD_BACK,"Head Back",new Rectangle(24,8,8,8),PreviewBox.VIEW_BACK));
-         surfaces.push(new Surface(Surface.HEAD_TOP,"Head Top",new Rectangle(8,0,8,8),PreviewBox.VIEW_TOP));
-         surfaces.push(new Surface(Surface.HEAD_BOTTOM,"Head Bottom",new Rectangle(16,0,8,8),PreviewBox.VIEW_BOTTOM));
-         surfaces.push(new Surface(Surface.ARM_RIGHT_LEFT,"Right Arm Outside",new Rectangle(40,20,4,12),PreviewBox.VIEW_LEFT));
-         surfaces.push(new Surface(Surface.ARM_RIGHT_FRONT,"Right Arm Front",new Rectangle(44,20,4,12),PreviewBox.VIEW_FRONT));
-         surfaces.push(new Surface(Surface.ARM_RIGHT_RIGHT,"Right Arm Inside",new Rectangle(48,20,4,12),PreviewBox.VIEW_RIGHT));
-         surfaces.push(new Surface(Surface.ARM_RIGHT_BACK,"Right Arm Back",new Rectangle(52,20,4,12),PreviewBox.VIEW_BACK));
-         surfaces.push(new Surface(Surface.ARM_RIGHT_TOP,"Right Arm Top",new Rectangle(44,16,4,4),PreviewBox.VIEW_TOP));
-         surfaces.push(new Surface(Surface.ARM_RIGHT_BOTTOM,"Right Arm Bottom",new Rectangle(48,16,4,4),PreviewBox.VIEW_BOTTOM));
-         surfaces.push(new Surface(Surface.BODY_LEFT,"Body Left",new Rectangle(16,20,4,12),PreviewBox.VIEW_LEFT));
-         surfaces.push(new Surface(Surface.BODY_FRONT,"Body Front",new Rectangle(20,20,8,12),PreviewBox.VIEW_FRONT));
-         surfaces.push(new Surface(Surface.BODY_RIGHT,"Body Right",new Rectangle(28,20,4,12),PreviewBox.VIEW_RIGHT));
-         surfaces.push(new Surface(Surface.BODY_BACK,"Body Back",new Rectangle(32,20,8,12),PreviewBox.VIEW_BACK));
-         surfaces.push(new Surface(Surface.BODY_TOP,"Body Top",new Rectangle(20,16,8,4),PreviewBox.VIEW_TOP));
-         surfaces.push(new Surface(Surface.BODY_BOTTOM,"Body Bottom",new Rectangle(28,16,8,4),PreviewBox.VIEW_BOTTOM));
-         surfaces.push(new Surface(Surface.LEG_RIGHT_LEFT,"Right Leg Outside",new Rectangle(0,20,4,12),PreviewBox.VIEW_LEFT));
-         surfaces.push(new Surface(Surface.LEG_RIGHT_FRONT,"Right Leg Front",new Rectangle(4,20,4,12),PreviewBox.VIEW_FRONT));
-         surfaces.push(new Surface(Surface.LEG_RIGHT_RIGHT,"Right Leg Inside",new Rectangle(8,20,4,12),PreviewBox.VIEW_RIGHT));
-         surfaces.push(new Surface(Surface.LEG_RIGHT_BACK,"Right Leg Back",new Rectangle(12,20,4,12),PreviewBox.VIEW_BACK));
-         surfaces.push(new Surface(Surface.LEG_RIGHT_TOP,"Right Leg Top",new Rectangle(4,16,4,4),PreviewBox.VIEW_TOP));
-         surfaces.push(new Surface(Surface.LEG_RIGHT_BOTTOM,"Right Leg Bottom",new Rectangle(8,16,4,4),PreviewBox.VIEW_BOTTOM));
-         surfaces.push(new Surface(Surface.HAT_LEFT,"Hat Left",new Rectangle(32,8,8,8),PreviewBox.VIEW_LEFT));
-         surfaces.push(new Surface(Surface.HAT_FRONT,"Hat Front",new Rectangle(40,8,8,8),PreviewBox.VIEW_FRONT));
-         surfaces.push(new Surface(Surface.HAT_RIGHT,"Hat Right",new Rectangle(48,8,8,8),PreviewBox.VIEW_RIGHT));
-         surfaces.push(new Surface(Surface.HAT_BACK,"Hat Back",new Rectangle(56,8,8,8),PreviewBox.VIEW_BACK));
-         surfaces.push(new Surface(Surface.HAT_TOP,"Hat Top",new Rectangle(40,0,8,8),PreviewBox.VIEW_TOP));
-         surfaces.push(new Surface(Surface.HAT_BOTTOM,"Hat Bottom",new Rectangle(48,0,8,8),PreviewBox.VIEW_BOTTOM));
-         surfaces.push(new Surface(Surface.ARM_LEFT_LEFT,"Left Arm Inside",new Rectangle(32,52,4,12),PreviewBox.VIEW_LEFT));
-         surfaces.push(new Surface(Surface.ARM_LEFT_FRONT,"Left Arm Front",new Rectangle(36,52,4,12),PreviewBox.VIEW_FRONT));
-         surfaces.push(new Surface(Surface.ARM_LEFT_RIGHT,"Left Arm Outside",new Rectangle(40,52,4,12),PreviewBox.VIEW_RIGHT));
-         surfaces.push(new Surface(Surface.ARM_LEFT_BACK,"Left Arm Back",new Rectangle(44,52,4,12),PreviewBox.VIEW_BACK));
-         surfaces.push(new Surface(Surface.ARM_LEFT_TOP,"Left Arm Top",new Rectangle(36,48,4,4),PreviewBox.VIEW_TOP));
-         surfaces.push(new Surface(Surface.ARM_LEFT_BOTTOM,"Left Arm Bottom",new Rectangle(40,48,4,4),PreviewBox.VIEW_BOTTOM));
-         surfaces.push(new Surface(Surface.LEG_LEFT_LEFT,"Left Leg Inside",new Rectangle(16,52,4,12),PreviewBox.VIEW_LEFT));
-         surfaces.push(new Surface(Surface.LEG_LEFT_FRONT,"Left Leg Front",new Rectangle(20,52,4,12),PreviewBox.VIEW_FRONT));
-         surfaces.push(new Surface(Surface.LEG_LEFT_RIGHT,"Left Leg Outside",new Rectangle(24,52,4,12),PreviewBox.VIEW_RIGHT));
-         surfaces.push(new Surface(Surface.LEG_LEFT_BACK,"Left Leg Back",new Rectangle(28,52,4,12),PreviewBox.VIEW_BACK));
-         surfaces.push(new Surface(Surface.LEG_LEFT_TOP,"Left Leg Top",new Rectangle(20,48,4,4),PreviewBox.VIEW_TOP));
-         surfaces.push(new Surface(Surface.LEG_LEFT_BOTTOM,"Left Leg Bottom",new Rectangle(24,48,4,4),PreviewBox.VIEW_BOTTOM));
-         surfaces.push(new Surface(Surface.BODY_LEFT_JACKET,"Body Jacket Left",new Rectangle(16,36,4,12),PreviewBox.VIEW_LEFT));
-         surfaces.push(new Surface(Surface.BODY_FRONT_JACKET,"Body Jacket Front",new Rectangle(20,36,8,12),PreviewBox.VIEW_FRONT));
-         surfaces.push(new Surface(Surface.BODY_RIGHT_JACKET,"Body Jacket Right",new Rectangle(28,36,4,12),PreviewBox.VIEW_RIGHT));
-         surfaces.push(new Surface(Surface.BODY_BACK_JACKET,"Body Jacket Back",new Rectangle(32,36,8,12),PreviewBox.VIEW_BACK));
-         surfaces.push(new Surface(Surface.BODY_TOP_JACKET,"Body Jacket Top",new Rectangle(20,32,8,4),PreviewBox.VIEW_TOP));
-         surfaces.push(new Surface(Surface.BODY_BOTTOM_JACKET,"Body Jacket Bottom",new Rectangle(28,32,8,4),PreviewBox.VIEW_BOTTOM));
-         surfaces.push(new Surface(Surface.ARM_RIGHT_LEFT_JACKET,"Right Arm Jacket Outside",new Rectangle(40,36,4,12),PreviewBox.VIEW_LEFT));
-         surfaces.push(new Surface(Surface.ARM_RIGHT_FRONT_JACKET,"Right Arm Jacket Front",new Rectangle(44,36,4,12),PreviewBox.VIEW_FRONT));
-         surfaces.push(new Surface(Surface.ARM_RIGHT_RIGHT_JACKET,"Right Arm Jacket Inside",new Rectangle(48,36,4,12),PreviewBox.VIEW_RIGHT));
-         surfaces.push(new Surface(Surface.ARM_RIGHT_BACK_JACKET,"Right Arm Jacket Back",new Rectangle(52,36,4,12),PreviewBox.VIEW_BACK));
-         surfaces.push(new Surface(Surface.ARM_RIGHT_TOP_JACKET,"Right Arm Jacket Top",new Rectangle(44,32,4,4),PreviewBox.VIEW_TOP));
-         surfaces.push(new Surface(Surface.ARM_RIGHT_BOTTOM_JACKET,"Right Arm Jacket Bottom",new Rectangle(48,32,4,4),PreviewBox.VIEW_BOTTOM));
-         surfaces.push(new Surface(Surface.LEG_RIGHT_LEFT_JACKET,"Right Leg Jacket Outside",new Rectangle(0,36,4,12),PreviewBox.VIEW_LEFT));
-         surfaces.push(new Surface(Surface.LEG_RIGHT_FRONT_JACKET,"Right Leg Jacket Front",new Rectangle(4,36,4,12),PreviewBox.VIEW_FRONT));
-         surfaces.push(new Surface(Surface.LEG_RIGHT_RIGHT_JACKET,"Right Leg Jacket Inside",new Rectangle(8,36,4,12),PreviewBox.VIEW_RIGHT));
-         surfaces.push(new Surface(Surface.LEG_RIGHT_BACK_JACKET,"Right Leg Jacket Back",new Rectangle(12,36,4,12),PreviewBox.VIEW_BACK));
-         surfaces.push(new Surface(Surface.LEG_RIGHT_TOP_JACKET,"Right Leg Jacket Top",new Rectangle(4,32,4,4),PreviewBox.VIEW_TOP));
-         surfaces.push(new Surface(Surface.LEG_RIGHT_BOTTOM_JACKET,"Right Leg Jacket Bottom",new Rectangle(8,32,4,4),PreviewBox.VIEW_BOTTOM));
-         surfaces.push(new Surface(Surface.ARM_LEFT_LEFT_JACKET,"Left Arm Jacket Inside",new Rectangle(48,52,4,12),PreviewBox.VIEW_LEFT));
-         surfaces.push(new Surface(Surface.ARM_LEFT_FRONT_JACKET,"Left Arm Jacket Front",new Rectangle(52,52,4,12),PreviewBox.VIEW_FRONT));
-         surfaces.push(new Surface(Surface.ARM_LEFT_RIGHT_JACKET,"Left Arm Jacket Outside",new Rectangle(56,52,4,12),PreviewBox.VIEW_RIGHT));
-         surfaces.push(new Surface(Surface.ARM_LEFT_BACK_JACKET,"Left Arm Jacket Back",new Rectangle(60,52,4,12),PreviewBox.VIEW_BACK));
-         surfaces.push(new Surface(Surface.ARM_LEFT_TOP_JACKET,"Left Arm Jacket Top",new Rectangle(52,48,4,4),PreviewBox.VIEW_TOP));
-         surfaces.push(new Surface(Surface.ARM_LEFT_BOTTOM_JACKET,"Left Arm Jacket Bottom",new Rectangle(56,48,4,4),PreviewBox.VIEW_BOTTOM));
-         surfaces.push(new Surface(Surface.LEG_LEFT_LEFT_JACKET,"Left Leg Jacket Inside",new Rectangle(0,52,4,12),PreviewBox.VIEW_LEFT));
-         surfaces.push(new Surface(Surface.LEG_LEFT_FRONT_JACKET,"Left Leg Jacket Front",new Rectangle(4,52,4,12),PreviewBox.VIEW_FRONT));
-         surfaces.push(new Surface(Surface.LEG_LEFT_RIGHT_JACKET,"Left Leg Jacket Outside",new Rectangle(8,52,4,12),PreviewBox.VIEW_RIGHT));
-         surfaces.push(new Surface(Surface.LEG_LEFT_BACK_JACKET,"Left Leg Jacket Back",new Rectangle(12,52,4,12),PreviewBox.VIEW_BACK));
-         surfaces.push(new Surface(Surface.LEG_LEFT_TOP_JACKET,"Left Leg Jacket Top",new Rectangle(4,48,4,4),PreviewBox.VIEW_TOP));
-         surfaces.push(new Surface(Surface.LEG_LEFT_BOTTOM_JACKET,"Left Leg Jacket Bottom",new Rectangle(8,48,4,4),PreviewBox.VIEW_BOTTOM));
-      }
-      
-      public function cleanupMenuBrowse() : void
-      {
-         ngSaveFile = null;
-         this.mcPreviewBox.cleanup();
-         removeChild(this.mcPreviewBox);
-         API.removeEventListener(APIEvent.FILE_LOADED,this.skinLoaded);
-         API.removeEventListener(APIEvent.VOTE_COMPLETE,this.voteComplete);
-         this.btnBackFromBrowse.removeEventListener(MouseEvent.CLICK,this.press_btnBackFromBrowse);
-         this.btnSearch.removeEventListener(MouseEvent.CLICK,this.press_btnSearch);
-         this.btnClearSearch.removeEventListener(MouseEvent.CLICK,this.press_btnClearSearch);
-         removeChild(this.saveBrowser);
-         removeChild(this.voteBar);
-         this.saveBrowser = null;
-         this.voteBar = null;
-      }
-      
-      public function clickTank(param1:MouseEvent) : void
-      {
-         Utilities.clickLink("http://newgrounds.com");
-      }
-      
-      public function ioError(param1:IOErrorEvent) : void
-      {
-         generateOKDialog("There was an error opening the file");
-         this.enableBack();
-      }
-      
-      public function initEditor() : void
-      {
-         if(this.editorFirstInit)
-         {
-            this.editorFirstInit = false;
-            showAdvancedOptions = false;
-            curTool = TOOL_NONE;
-            savedView = PreviewBox.VIEW_FRONT;
-            layerSelection = null;
-            this.savedLayerScrollPosition = 0;
-            this.mcToolFollow = new ToolFollow();
-            this.mcToolFollow.mouseEnabled = this.mcToolFollow.mouseChildren = false;
-            this.mcToolFollow.visible = false;
-            this.mcToolFollow.cacheAsBitmap = true;
-            addChild(this.mcToolFollow);
-            i = 0;
-            while(i < 1)
-            {
-               ++i;
-            }
-            dummySkin = new Skin();
-            dummySkin.baseBitmapData = curSkin.baseBitmapData.clone();
-         }
-         this.mcTut1.visible = Utilities.saveFile.firstTime;
-         if(this.mcTut1.visible)
-         {
-            this.btnAddLayer.filters = new Array(new GlowFilter(4294967295,1,12,12,3,2));
-         }
-         this.checkForSecondTutorialClip();
-         this.loadPreviewBox(413,67,1);
-         this.txtSkinName.text = curSkin.name;
-         this.txtSkinName.maxChars = MAX_LAYER_NAME_LENGTH;
-         this.txtSkinName.addEventListener(Event.CHANGE,this.changeSkinName);
-         this.btnBackFromEditor.buttonMode = true;
-         this.btnAddLayer.buttonMode = true;
-         this.btnCopyLayer.buttonMode = true;
-         this.btnExport.buttonMode = true;
-         this.btnCopyLayer.addEventListener(MouseEvent.CLICK,this.press_btnCopyLayer);
-         this.btnCopyLayer.addEventListener(MouseEvent.ROLL_OVER,this.genericMouseOver);
-         this.btnCopyLayer.addEventListener(MouseEvent.ROLL_OUT,this.genericMouseOut);
-         this.btnAddLayer.addEventListener(MouseEvent.CLICK,this.press_btnAddLayer);
-         this.btnAddLayer.addEventListener(MouseEvent.ROLL_OVER,this.genericMouseOver);
-         this.btnAddLayer.addEventListener(MouseEvent.ROLL_OUT,this.genericMouseOut);
-         this.btnBackFromEditor.addEventListener(MouseEvent.CLICK,this.press_btnBackFromEditor);
-         this.btnBackFromEditor.addEventListener(MouseEvent.ROLL_OVER,this.genericMouseOver);
-         this.btnBackFromEditor.addEventListener(MouseEvent.ROLL_OUT,this.genericMouseOut);
-         this.btnExport.addEventListener(MouseEvent.CLICK,this.press_btnExport);
-         this.btnExport.addEventListener(MouseEvent.ROLL_OVER,this.genericMouseOver);
-         this.btnExport.addEventListener(MouseEvent.ROLL_OUT,this.genericMouseOut);
-         this.btnShowSelection.buttonMode = true;
-         this.btnDeleteSelection.buttonMode = true;
-         this.btnShowSelection.addEventListener(MouseEvent.ROLL_OVER,this.genericMouseOver);
-         this.btnDeleteSelection.addEventListener(MouseEvent.ROLL_OVER,this.genericMouseOver);
-         this.btnDeleteSelection.addEventListener(MouseEvent.ROLL_OUT,this.genericMouseOut);
-         this.btnShowSelection.addEventListener(MouseEvent.ROLL_OUT,this.genericMouseOut);
-         this.btnShowSelection.addEventListener(MouseEvent.CLICK,this.press_btnShowSelection);
-         this.btnDeleteSelection.addEventListener(MouseEvent.CLICK,this.press_btnDeleteSelection);
-         this.lstLayers.horizontalScrollPolicy = ScrollPolicy.OFF;
-         this.lstLayers.tabEnabled = false;
-         this.lstLayers.mouseFocusEnabled = false;
-         layerBoxes = new Vector.<LayerBox>();
-         this.updateLayers();
-         cursorMode = CURSOR_FREE;
-         this.mcGroupIndicator.mouseEnabled = this.mcGroupIndicator.mouseChildren = false;
-      }
-      
-      public function fileLoaded(param1:Event) : void
-      {
-         var importBitmap:Bitmap = null;
-         var e:Event = param1;
-         this.enableBack();
-         if(!(this.importLoader.width == SKIN_WIDTH && this.importLoader.height == SKIN_HEIGHT) && !(this.importLoader.width == SKIN_WIDTH && this.importLoader.height == SKIN_HEIGHT / 2))
-         {
-            generateOKDialog("PNG must be exactly " + SKIN_WIDTH + "x" + SKIN_HEIGHT + " or 64x32");
-            return;
-         }
-         try
-         {
-            importBitmap = this.importLoader.content as Bitmap;
-            savedView = PreviewBox.VIEW_FRONT;
-            importBitmap.bitmapData = convertBmpdTo1_8(importBitmap.bitmapData);
-            this.mcPreviewBox.loadBase(importBitmap.bitmapData);
-         }
-         catch(e:Error)
-         {
-            ioError(null);
-            return;
-         }
-         this.mcPreviewBox.refreshView();
-         this.enableImportGo();
-      }
-      
-      public function selectAllLayers() : void
-      {
-         if(curSkin.layers.length == 0)
-         {
-            return;
-         }
-         for each(tempLayer in curSkin.layers)
-         {
-            tempLayer.selected = true;
-         }
-         layerSelection = new LayerSelection(curSkin.layers[0],curSkin.layers.length);
-      }
-      
-      public function startListeningForGroupDrag() : void
-      {
-         dragDelayFrames = 0;
-         dragStartX = mouseX;
-         dragStartY = mouseY;
-         listenForDrag = true;
-      }
-      
-      function __setProp_chkShowBase_editor_maincontent_11() : *
-      {
-         try
-         {
-            this.chkShowBase["componentInspectorSetting"] = true;
-         }
-         catch(e:Error)
-         {
-         }
-         this.chkShowBase.enabled = true;
-         this.chkShowBase.label = "";
-         this.chkShowBase.labelPlacement = "right";
-         this.chkShowBase.selected = false;
-         this.chkShowBase.visible = true;
-         try
-         {
-            this.chkShowBase["componentInspectorSetting"] = false;
-         }
-         catch(e:Error)
-         {
-         }
-      }
-      
-      public function listenForAPIConnected(param1:Event) : void
-      {
-         if(API.connected)
-         {
-            removeEventListener(Event.ENTER_FRAME,this.listenForAPIConnected);
-            API.loadSaveFile(loaderInfo.parameters.NewgroundsAPI_SaveFileID);
-            API.addEventListener(APIEvent.FILE_LOADED,this.preskinLoaded);
-         }
-      }
-      
-      public function initMenuImportTXT() : void
-      {
-         this.btnGoImport.buttonMode = true;
-         this.btnGoImport.addEventListener(MouseEvent.CLICK,this.press_btnGoImport);
-         this.disableImportGo();
-         this.btnBackFromImport.buttonMode = true;
-         this.btnBackFromImport.addEventListener(MouseEvent.CLICK,this.press_btnBackFromImport);
-         this.btnBrowse.addEventListener(MouseEvent.CLICK,this.press_btnBrowse);
-         this.btnBrowse.buttonMode = true;
-         this.importFileReference = new FileReference();
-         this.importFileReference.addEventListener(Event.SELECT,this.referenceBrowse);
-         this.importFileReference.addEventListener(Event.COMPLETE,this.referenceLoadedTXT);
-         this.importFileReference.addEventListener(IOErrorEvent.IO_ERROR,this.ioError);
-      }
-      
-      public function showCurPreset(param1:Event = null) : void
-      {
-         savedView = PreviewBox.VIEW_FRONT;
-         var _loc2_:PresetSkin = getPresetSkin(this.lstPresets.selectedItem.data);
-         this.mcPreviewBox.loadBase(_loc2_.getBitmapData());
-         this.mcPreviewBox.refreshView();
-      }
-      
-      function __setProp_saveBrowser_menu_Layer1_8() : *
-      {
-         try
-         {
-            this.saveBrowser["componentInspectorSetting"] = true;
-         }
-         catch(e:Error)
-         {
-         }
-         this.saveBrowser.saveGroupName = "skins";
-         this.saveBrowser.title = "User Created Skins";
-         this.saveBrowser.sortDescending = true;
-         this.saveBrowser.sortField = "createdOn";
-         this.saveBrowser.customSortField = "";
-         try
-         {
-            this.saveBrowser["componentInspectorSetting"] = false;
-         }
-         catch(e:Error)
-         {
-         }
-      }
-      
-      public function preskinLoaded(param1:APIEvent) : *
-      {
-         if(param1.success)
-         {
-            preloadNGSaveFile = SaveFile(param1.data);
-            gotoAndStop("browse","menu");
-         }
-         API.removeEventListener(APIEvent.FILE_LOADED,this.preskinLoaded);
-      }
-      
-      public function clickSkincraftPack(param1:MouseEvent) : void
-      {
-         Utilities.clickLink("http://afro-ninja.com/skincraft");
-      }
-      
-      public function checkForScroll(param1:Event) : *
-      {
-         if(this.pixelEditorMask.getRect(Main.rootRef).contains(mouseX,mouseY))
-         {
-            if(this.pixelEditorMask.mouseY < 50)
-            {
-               this.pixelEditor.y += 2;
-            }
-            else if(this.pixelEditorMask.mouseY > this.pixelEditorMask.height - 50)
-            {
-               this.pixelEditor.y -= 2;
-            }
-         }
-         if(this.pixelEditor.y > this.pixelEditorMask.y)
-         {
-            this.pixelEditor.y = this.pixelEditorMask.y;
-         }
-         else if(this.pixelEditor.y + this.pixelEditor.height < this.pixelEditorMask.y + this.pixelEditorMask.height)
-         {
-            this.pixelEditor.y = this.pixelEditorMask.y + this.pixelEditorMask.height - this.pixelEditor.height;
-         }
-      }
-      
-      public function initCustomLayerEditor() : void
-      {
-         this.initSharedLayerContent();
-         var _loc1_:uint = CustomLayer(layerToEdit).targetView;
-         this.pixelEditor = new PixelEditor(10,65);
-         addChild(this.pixelEditor);
-         this.pixelEditor.drawView(_loc1_);
-         if(_loc1_ == PixelEditor.VIEW_ARM_RIGHT || _loc1_ == PixelEditor.VIEW_ARM_LEFT || _loc1_ == PixelEditor.VIEW_LEG_RIGHT || _loc1_ == PixelEditor.VIEW_LEG_LEFT || _loc1_ == PixelEditor.VIEW_ARM_LEFT_JACKET || _loc1_ == PixelEditor.VIEW_ARM_RIGHT_JACKET || _loc1_ == PixelEditor.VIEW_LEG_LEFT_JACKET || _loc1_ == PixelEditor.VIEW_LEG_RIGHT_JACKET)
-         {
-            this.loadPreviewBox(400,105,0.7);
-         }
-         else if(_loc1_ == PixelEditor.VIEW_BODY || _loc1_ == PixelEditor.VIEW_BODY_JACKET)
-         {
-            this.loadPreviewBox(450,105,0.7);
-         }
-         else
-         {
-            this.loadPreviewBox(535,115,0.6);
-         }
-         if(_loc1_ == PixelEditor.VIEW_ALL)
-         {
-            this.pixelEditorMask = new Bitmap(new BitmapData(1 + PixelEditor.PIXEL_SCALE * 64,1 + PixelEditor.PIXEL_SCALE * 32,false,16711680));
-         }
-         else
-         {
-            this.pixelEditorMask = new Bitmap(new BitmapData(1 + PixelEditor.PIXEL_SCALE * this.pixelEditor.curViewRect.width,1 + PixelEditor.PIXEL_SCALE * this.pixelEditor.curViewRect.height,false,16711680));
-         }
-         this.pixelEditorMask.x = this.pixelEditor.x;
-         this.pixelEditorMask.y = this.pixelEditor.y;
-         this.pixelEditor.mask = this.pixelEditorMask;
-         if(_loc1_ == PixelEditor.VIEW_ALL)
-         {
-            this.pixelEditorMask.addEventListener(Event.ENTER_FRAME,this.checkForScroll);
-         }
-         this.txtSpecialMessage.text = "";
-         if(_loc1_ == PixelEditor.VIEW_HAT || _loc1_ == PixelEditor.VIEW_BODY_JACKET || _loc1_ == PixelEditor.VIEW_ARM_LEFT_JACKET || _loc1_ == PixelEditor.VIEW_ARM_RIGHT_JACKET || _loc1_ == PixelEditor.VIEW_LEG_LEFT_JACKET || _loc1_ == PixelEditor.VIEW_LEG_RIGHT_JACKET)
-         {
-            this.sldBlur.mouseEnabled = this.sldBlur.visible = false;
-            this.sldOpacity.mouseEnabled = this.sldOpacity.visible = false;
-            this.txtBlurValue.text = this.txtOpacityValue.text = "";
-            this.mcLabelBlur.visible = this.mcLabelOpacity.visible = false;
-            this.txtSpecialMessage.text = "*Content in Hat/Jacket layers will always appear above other layers";
-         }
-         else if(_loc1_ == PixelEditor.VIEW_ALL)
-         {
-            this.txtSpecialMessage.text = "*Minecraft does not support transparent pixels in Hat surfaces";
-         }
-         this.mcShiftMessage.visible = false;
-         this.chkShowBase.selected = true;
-         this.chkShowBase.addEventListener(Event.CHANGE,this.changeChkShowBase);
-         this.chkShowBase.mouseFocusEnabled = false;
-         this.btnPencil.toolID = TOOL_PENCIL;
-         this.btnEraser.toolID = TOOL_ERASER;
-         this.btnBucket.toolID = TOOL_BUCKET;
-         this.btnBucket.buttonMode = this.btnPencil.buttonMode = this.btnEraser.buttonMode = true;
-         this.btnUndo.buttonMode = true;
-         this.btnUndo.mouseChildren = false;
-         this.btnPencil.mcHighlight.visible = this.btnEraser.mcHighlight.visible = this.btnBucket.mcHighlight.visible = false;
-         this.btnPencil.mouseChildren = this.btnEraser.mouseChildren = this.btnBucket.mouseChildren = false;
-         this.btnPencil.addEventListener(MouseEvent.CLICK,this.press_btnTool);
-         this.btnEraser.addEventListener(MouseEvent.CLICK,this.press_btnTool);
-         this.btnBucket.addEventListener(MouseEvent.CLICK,this.press_btnTool);
-         this.btnUndo.addEventListener(MouseEvent.CLICK,this.press_btnUndo);
-         this.mcToolFollow.visible = false;
-         setChildIndex(this.mcToolFollow,numChildren - 1);
-         curTool = TOOL_NONE;
-         this.updateUndoButton();
-         i = 0;
-         while(i < PixelEditor.viewNames.length)
-         {
-            this.cmbEditorView.addItem({
-               "label":PixelEditor.viewNames[i],
-               "data":i
-            });
-            ++i;
-         }
-         this.cmbEditorView.addEventListener(Event.CHANGE,this.changeEditorView);
-         this.cmbEditorView.mouseFocusEnabled = false;
-         this.txtSurfaceName.text = "";
-         this.changeTool(TOOL_PENCIL);
-         this.btnPencil.mcHighlight.visible = true;
-      }
-      
-      function __setProp_sldColorIntensity_editor_maincontent_10() : *
-      {
-         try
-         {
-            this.sldColorIntensity["componentInspectorSetting"] = true;
-         }
-         catch(e:Error)
-         {
-         }
-         this.sldColorIntensity.direction = "horizontal";
-         this.sldColorIntensity.enabled = true;
-         this.sldColorIntensity.liveDragging = true;
-         this.sldColorIntensity.maximum = 100;
-         this.sldColorIntensity.minimum = 0;
-         this.sldColorIntensity.snapInterval = 0;
-         this.sldColorIntensity.tickInterval = 0;
-         this.sldColorIntensity.value = 0;
-         this.sldColorIntensity.visible = true;
-         try
-         {
-            this.sldColorIntensity["componentInspectorSetting"] = false;
-         }
-         catch(e:Error)
-         {
-         }
-      }
-      
-      public function press_btnBackFromImport(param1:MouseEvent) : void
-      {
-         if(currentLabel == "import_png")
-         {
-            this.cleanupMenuImportPNG();
-         }
-         else if(currentLabel == "import_txt")
-         {
-            if(curSkin)
-            {
-               curSkin.cleanup();
-               curSkin = null;
-            }
-            this.cleanupMenuImportTXT();
-         }
-         gotoAndStop("main","menu");
-      }
-      
-      public function updateUndoButton() : void
-      {
-         if(this.pixelEditor.undoLog.length > 0)
-         {
-            this.btnUndo.mouseEnabled = true;
-            this.btnUndo.alpha = 1;
-         }
-         else
-         {
-            this.btnUndo.mouseEnabled = false;
-            this.btnUndo.alpha = 0.3;
-         }
-      }
-      
-      public function initMenuMain() : void
-      {
-         this.mcTankLogo.buttonMode = true;
-         this.mcTankLogo.addEventListener(MouseEvent.CLICK,this.clickTank);
-         this.btnPresets.addEventListener(MouseEvent.CLICK,this.press_btnPresets);
-         this.btnImportPNG.addEventListener(MouseEvent.CLICK,this.press_btnImportPNG);
-         this.btnImportTXT.addEventListener(MouseEvent.CLICK,this.press_btnImportTXT);
-         this.btnBrowseUploads.addEventListener(MouseEvent.CLICK,this.press_btnBrowseUploads);
-         Utilities.mc2Btn(this.btnPresets);
-         Utilities.mc2Btn(this.btnImportPNG);
-         Utilities.mc2Btn(this.btnImportTXT);
-         Utilities.mc2Btn(this.btnBrowseUploads);
-      }
-      
-      public function checkForSecondTutorialClip() : void
-      {
-         if(curSkin.layers.length == 1 && Utilities.saveFile.firstLayer)
-         {
-            this.mcTut2.visible = true;
-         }
-         else
-         {
-            this.mcTut2.visible = false;
-         }
-      }
-      
-      public function gameLoseFocus(param1:Event) : void
-      {
-         listenForDrag = false;
-         if(cursorMode == CURSOR_DRAG)
-         {
-            this.stopDragLayerSelection();
-         }
-         if(cursorMode == CURSOR_DRAW)
-         {
-            cursorMode = CURSOR_FREE;
-         }
-         KeyManager.releaseAllKeys();
-      }
-      
-      public function initLayerEditor() : void
-      {
-         this.initSharedLayerContent();
-         this.loadPreviewBox(413,67,1);
-         this.mcPreviewBox.mcBGLabel.visible = false;
-         if(getPiece(PremadeLayer(layerToEdit).targetPieceID).canMove)
-         {
-            this.chkInvertX.selected = layerToEdit.invertX;
-            this.chkInvertY.selected = layerToEdit.invertY;
-            this.chkInvertX.addEventListener(Event.CHANGE,this.changeEitherInversion);
-            this.chkInvertY.addEventListener(Event.CHANGE,this.changeEitherInversion);
-            this.btnArrowUp.buttonMode = this.btnArrowDown.buttonMode = this.btnArrowLeft.buttonMode = this.btnArrowRight.buttonMode = true;
-            this.btnArrowUp.direction = UP;
-            this.btnArrowDown.direction = DOWN;
-            this.btnArrowLeft.direction = LEFT;
-            this.btnArrowRight.direction = RIGHT;
-            this.btnArrowUp.addEventListener(MouseEvent.CLICK,this.press_btnArrow);
-            this.btnArrowUp.addEventListener(MouseEvent.ROLL_OVER,this.genericMouseOver);
-            this.btnArrowUp.addEventListener(MouseEvent.ROLL_OUT,this.genericMouseOut);
-            this.btnArrowDown.addEventListener(MouseEvent.CLICK,this.press_btnArrow);
-            this.btnArrowDown.addEventListener(MouseEvent.ROLL_OVER,this.genericMouseOver);
-            this.btnArrowDown.addEventListener(MouseEvent.ROLL_OUT,this.genericMouseOut);
-            this.btnArrowLeft.addEventListener(MouseEvent.CLICK,this.press_btnArrow);
-            this.btnArrowLeft.addEventListener(MouseEvent.ROLL_OVER,this.genericMouseOver);
-            this.btnArrowLeft.addEventListener(MouseEvent.ROLL_OUT,this.genericMouseOut);
-            this.btnArrowRight.addEventListener(MouseEvent.CLICK,this.press_btnArrow);
-            this.btnArrowRight.addEventListener(MouseEvent.ROLL_OVER,this.genericMouseOver);
-            this.btnArrowRight.addEventListener(MouseEvent.ROLL_OUT,this.genericMouseOut);
-            this.mcNotAvailable.visible = false;
-         }
-         else
-         {
-            this.chkInvertX.mouseEnabled = this.chkInvertY.mouseEnabled = false;
-            this.chkInvertX.alpha = this.chkInvertY.alpha = 0.2;
-            this.btnArrowDown.alpha = this.btnArrowUp.alpha = this.btnArrowLeft.alpha = this.btnArrowRight.alpha = 0.2;
-            this.mcMovementExtra.alpha = 0.2;
-         }
-         this.chkFlattenColor.selected = layerToEdit.flattenColor;
-         this.chkFlattenColor.addEventListener(Event.CHANGE,this.changeFlattenColor);
-         this.colorGrabber.setColor(layerToEdit.tintColor,false);
-         this.colorGrabber.addEventListener(Event.CHANGE,this.changeColor);
-         this.btnAdvancedOptions.buttonMode = true;
-         this.btnAdvancedOptions.addEventListener(MouseEvent.CLICK,this.press_btnAdvancedOptions);
-         if(showAdvancedOptions)
-         {
-            this.btnAdvancedOptions.gotoAndStop(2);
-         }
-         this.sldColorIntensity.value = layerToEdit.colorIntensity;
-         this.sldTextureIntensity.value = layerToEdit.textureIntensity;
-         this.sldColorIntensity.addEventListener(SliderEvent.CHANGE,this.changeColorIntensity);
-         this.sldTextureIntensity.addEventListener(SliderEvent.CHANGE,this.changeTextureIntensity);
-      }
-      
-      function __setProp_chkInvertX_editor_maincontent_10() : *
-      {
-         try
-         {
-            this.chkInvertX["componentInspectorSetting"] = true;
-         }
-         catch(e:Error)
-         {
-         }
-         this.chkInvertX.enabled = true;
-         this.chkInvertX.label = "";
-         this.chkInvertX.labelPlacement = "right";
-         this.chkInvertX.selected = false;
-         this.chkInvertX.visible = true;
-         try
-         {
-            this.chkInvertX["componentInspectorSetting"] = false;
-         }
-         catch(e:Error)
-         {
-         }
-      }
-      
-      public function rollOverDeleteSelection(param1:MouseEvent) : void
-      {
-         if(cursorMode == CURSOR_FREE)
-         {
-            showDescription("Delete selected layers");
-         }
-      }
-      
-      public function rollOverHideSelection(param1:MouseEvent) : void
-      {
-         if(cursorMode == CURSOR_FREE)
-         {
-            showDescription("Hide selected layers");
-         }
-      }
-      
-      public function rollOutShowSelection(param1:MouseEvent) : void
-      {
-         showDescription("");
-      }
-      
-      public function genericMouseOver(param1:MouseEvent) : void
-      {
-         sfxBtnHover.play();
-         MovieClip(param1.currentTarget).gotoAndStop(2);
-      }
-      
-      public function press_btnPresets(param1:MouseEvent) : void
-      {
-         this.cleanupMenuMain();
-         gotoAndStop("presets","menu");
-      }
-      
-      public function changeEitherInversion(param1:Event) : void
-      {
-         layerToEdit.invertX = this.chkInvertX.selected;
-         layerToEdit.invertY = this.chkInvertY.selected;
-         this.mcPreviewBox.refreshView();
-      }
-      
-      function __setProp_voteBar_menu_Layer1_8() : *
-      {
-         try
-         {
-            this.voteBar["componentInspectorSetting"] = true;
-         }
-         catch(e:Error)
-         {
-         }
-         this.voteBar.title = "";
-         this.voteBar.ratingName = "score";
-         this.voteBar.fileMode = "Manually Set File";
-         try
-         {
-            this.voteBar["componentInspectorSetting"] = false;
-         }
-         catch(e:Error)
-         {
-         }
-      }
-      
-      public function updateSliderDisplays() : void
-      {
-         if(this.txtOpacityValue)
-         {
-            this.txtOpacityValue.text = layerToEdit.opacity.toString();
-         }
-         if(this.txtColorIntensity)
-         {
-            this.txtColorIntensity.text = layerToEdit.colorIntensity.toString();
-         }
-         if(this.txtTextureIntensity)
-         {
-            this.txtTextureIntensity.text = layerToEdit.textureIntensity.toString();
-         }
-         if(this.txtBlurValue)
-         {
-            this.txtBlurValue.text = layerToEdit.blur.toString();
-         }
-      }
-      
-      public function referenceLoadedTXT(param1:Event) : void
-      {
-         var e:Event = param1;
-         try
-         {
-            this.importFileReference.data.uncompress();
-            curSkin = this.importFileReference.data.readObject();
-            this.mcPreviewBox.loadBase(curSkin.baseBitmapData);
-            this.mcPreviewBox.skin = curSkin;
-         }
-         catch(e:Error)
-         {
-            ioError(null);
-            return;
-         }
-         this.mcPreviewBox.refreshView();
-         this.enableBack();
-         this.enableImportGo();
-      }
-      
-      public function changeTextureIntensity(param1:Event) : void
-      {
-         layerToEdit.textureIntensity = uint(this.sldTextureIntensity.value);
-         this.updateSliderDisplays();
-         this.mcPreviewBox.refreshView();
-      }
-      
-      public function stopDragLayerSelection() : void
-      {
-         cursorMode = CURSOR_FREE;
-         layerSelection.unfadeAll();
-         this.updateLayers();
-         this.mcGroupIndicator.x = this.mcGroupIndicator.y = 0;
-         this.mcGroupIndicator.visible = false;
-         for each(tempLayerBox in layerBoxes)
-         {
-            tempLayerBox.voidEligibleInsertion();
-         }
-      }
-      
-      function __setProp_sldBlur_editor_maincontent_11() : *
-      {
-         try
-         {
-            this.sldBlur["componentInspectorSetting"] = true;
-         }
-         catch(e:Error)
-         {
-         }
-         this.sldBlur.direction = "horizontal";
-         this.sldBlur.enabled = true;
-         this.sldBlur.liveDragging = true;
-         this.sldBlur.maximum = 4;
-         this.sldBlur.minimum = 0;
-         this.sldBlur.snapInterval = 0;
-         this.sldBlur.tickInterval = 0;
-         this.sldBlur.value = 0;
-         this.sldBlur.visible = true;
-         try
-         {
-            this.sldBlur["componentInspectorSetting"] = false;
-         }
-         catch(e:Error)
-         {
-         }
-      }
-      
-      public function referenceLoaded(param1:Event) : void
-      {
-         var e:Event = param1;
-         this.importLoader.unload();
-         try
-         {
-            this.importLoader.loadBytes(this.importFileReference.data);
-         }
-         catch(e:Error)
-         {
-            ioError(null);
-         }
-      }
-      
-      function __setProp_sldBlur_editor_maincontent_10() : *
-      {
-         try
-         {
-            this.sldBlur["componentInspectorSetting"] = true;
-         }
-         catch(e:Error)
-         {
-         }
-         this.sldBlur.direction = "horizontal";
-         this.sldBlur.enabled = true;
-         this.sldBlur.liveDragging = true;
-         this.sldBlur.maximum = 4;
-         this.sldBlur.minimum = 0;
-         this.sldBlur.snapInterval = 0;
-         this.sldBlur.tickInterval = 0;
-         this.sldBlur.value = 0;
-         this.sldBlur.visible = true;
-         try
-         {
-            this.sldBlur["componentInspectorSetting"] = false;
-         }
-         catch(e:Error)
-         {
-         }
-      }
-      
-      public function press_btnBrowse(param1:MouseEvent) : void
-      {
-         var pngFilter:FileFilter = null;
-         var txtFilter:FileFilter = null;
-         var e:MouseEvent = param1;
-         var fileFilters:Array = new Array();
-         if(currentLabel == "import_png")
-         {
-            pngFilter = new FileFilter("PNG Images","*.png");
-            fileFilters.push(pngFilter);
-         }
-         else if(currentLabel == "import_txt")
-         {
-            txtFilter = new FileFilter("Text Files","*.txt");
-            fileFilters.push(txtFilter);
-         }
-         try
-         {
-            this.importFileReference.browse(fileFilters);
-         }
-         catch(e:Error)
-         {
-            generateOKDialog("There was an error opening the file window");
-         }
-      }
-      
-      public function press_btnGoImport(param1:MouseEvent) : void
-      {
-         var _loc2_:Bitmap = null;
-         var _loc3_:CustomLayer = null;
-         if(currentLabel == "import_png")
-         {
-            _loc2_ = this.importLoader.content as Bitmap;
-            curSkin = new Skin();
-            curSkin.baseBitmapData = presetSkins[0].getBitmapData();
-            _loc3_ = new CustomLayer();
-            _loc3_.name = "Imported Skin";
-            _loc3_.customBitmapData = _loc2_.bitmapData.clone();
-            curSkin.addLayer(_loc3_,true);
-            this.cleanupMenuImportPNG();
-            this.editorFirstInit = true;
-            gotoAndStop("edit_main","editor");
-         }
-         else if(currentLabel == "import_txt")
-         {
-            this.cleanupMenuImportTXT();
-            this.editorFirstInit = true;
-            gotoAndStop("edit_main","editor");
-         }
-         sfxBtnClick.play();
-      }
-      
-      public function unloadPreviewBox() : void
-      {
-         if(this.mcPreviewBox)
-         {
-            this.mcPreviewBox.cleanup();
-            removeChild(this.mcPreviewBox);
-            this.mcPreviewBox = null;
-         }
-      }
-      
-      public function enableBack() : void
-      {
-         this.btnBackFromImport.mouseEnabled = true;
-         this.btnBackFromImport.alpha = 1;
-         if(this.btnLoad)
-         {
-            this.btnLoad.mouseEnabled = true;
-            this.btnLoad.alpha = 1;
-         }
-      }
-      
-      public function cleanupMenuImportPNG() : void
-      {
-         this.mcPreviewBox.cleanup();
-         this.importFileReference.removeEventListener(Event.SELECT,this.referenceBrowse);
-         this.importFileReference.removeEventListener(Event.COMPLETE,this.referenceLoaded);
-         this.importFileReference.removeEventListener(IOErrorEvent.IO_ERROR,this.ioError);
-         this.importLoader.contentLoaderInfo.removeEventListener(Event.COMPLETE,this.fileLoaded);
-         this.importFileReference = null;
-         this.importLoader = null;
-         this.btnBrowse.removeEventListener(MouseEvent.CLICK,this.press_btnBrowse);
-         this.btnGoImport.removeEventListener(MouseEvent.CLICK,this.press_btnImportPNG);
-         this.btnBackFromImport.removeEventListener(MouseEvent.CLICK,this.press_btnBackFromImport);
-      }
-      
-      public function genericMouseOut(param1:MouseEvent) : void
-      {
-         MovieClip(param1.currentTarget).gotoAndStop(1);
-      }
-      
-      public function cleanupEditor() : void
-      {
-         this.unloadPreviewBox();
-         this.mcLayerDialog.cleanup();
-         this.mcExportDialog.cleanup();
-         removeChild(this.mcToolFollow);
-         this.mcToolFollow = null;
-         curSkin.cleanup();
-         dummySkin.cleanup();
-         curSkin = dummySkin = null;
-         this.btnAddLayer.removeEventListener(MouseEvent.CLICK,this.press_btnAddLayer);
-         this.btnAddLayer.removeEventListener(MouseEvent.ROLL_OVER,this.genericMouseOver);
-         this.btnAddLayer.removeEventListener(MouseEvent.ROLL_OUT,this.genericMouseOut);
-         this.btnCopyLayer.removeEventListener(MouseEvent.CLICK,this.press_btnCopyLayer);
-         this.btnCopyLayer.removeEventListener(MouseEvent.ROLL_OVER,this.genericMouseOver);
-         this.btnCopyLayer.removeEventListener(MouseEvent.ROLL_OUT,this.genericMouseOut);
-         this.btnBackFromEditor.removeEventListener(MouseEvent.CLICK,this.press_btnBackFromEditor);
-         this.btnBackFromEditor.removeEventListener(MouseEvent.ROLL_OVER,this.genericMouseOver);
-         this.btnBackFromEditor.removeEventListener(MouseEvent.ROLL_OUT,this.genericMouseOut);
-         this.btnExport.removeEventListener(MouseEvent.CLICK,this.press_btnExport);
-         this.btnExport.removeEventListener(MouseEvent.ROLL_OVER,this.genericMouseOver);
-         this.btnExport.removeEventListener(MouseEvent.ROLL_OUT,this.genericMouseOut);
-         this.txtSkinName.removeEventListener(Event.CHANGE,this.changeSkinName);
-         this.btnShowSelection.removeEventListener(MouseEvent.ROLL_OVER,this.genericMouseOver);
-         this.btnDeleteSelection.removeEventListener(MouseEvent.ROLL_OVER,this.genericMouseOver);
-         this.btnDeleteSelection.removeEventListener(MouseEvent.ROLL_OUT,this.genericMouseOut);
-         this.btnShowSelection.removeEventListener(MouseEvent.ROLL_OUT,this.genericMouseOut);
-         this.btnShowSelection.removeEventListener(MouseEvent.CLICK,this.press_btnShowSelection);
-         this.btnDeleteSelection.removeEventListener(MouseEvent.CLICK,this.press_btnDeleteSelection);
-      }
-      
-      public function press_btnLoad(param1:Event) : void
-      {
-         var name:String = null;
-         var request:URLRequest = null;
-         var e:Event = param1;
-         this.disableImportGo();
-         this.disableBack();
-         this.importLoader.unload();
-         try
-         {
-            name = this.txtMCUsername.text;
-            request = new URLRequest("http://www.minecraft.net/skin/" + name + ".png");
-            this.importLoader.load(request);
-         }
-         catch(e:Error)
-         {
-            ioError(null);
-         }
-      }
-      
-      public function updateLayers() : void
-      {
-         var _loc1_:int = 0;
-         var _loc2_:Number = NaN;
-         this.mcPreviewBox.clearSourceBitmaps();
-         if(this.savedLayerScrollPosition == 0)
-         {
-            this.savedLayerScrollPosition = this.lstLayers.verticalScrollPosition;
-         }
-         for each(tempLayerBox in layerBoxes)
-         {
-            tempLayerBox.cleanup();
-            this.layerHolder.removeChild(tempLayerBox);
-         }
-         this.layerHolder = new Sprite();
-         layerBoxes = new Vector.<LayerBox>();
-         this.lstLayers.source = null;
-         _loc1_ = -1;
-         _loc2_ = 1;
-         i = curSkin.layers.length - 1;
-         while(i >= 0)
-         {
-            tempLayer = curSkin.layers[i];
-            tempLayerBox = new LayerBox(tempLayer);
-            tempLayerBox.y = _loc2_;
-            if(tempLayer.isNew)
-            {
-               tempLayer.isNew = false;
-               _loc1_ = _loc2_;
-            }
-            if(tempLayer.faded)
-            {
-               tempLayerBox.alpha = 0.3;
-            }
-            _loc2_ += tempLayerBox.mcOutline.height - 1;
-            this.layerHolder.addChild(tempLayerBox);
-            layerBoxes.push(tempLayerBox);
-            --i;
-         }
-         for each(tempLayerBox in layerBoxes)
-         {
-            if(tempLayerBox.targetLayer.selected)
-            {
-               this.layerHolder.setChildIndex(tempLayerBox,this.layerHolder.numChildren - 1);
-            }
-         }
-         if(layerBoxes.length > 0 && this.layerHolder.height + 2 < this.lstLayers.height)
-         {
-            layerBoxes[layerBoxes.length - 1].addBottomSpacer(this.lstLayers.height - (this.layerHolder.height + 2));
-         }
-         var _loc3_:Sprite = new Sprite();
-         _loc3_.graphics.drawRect(0,0,20,2);
-         _loc3_.mouseEnabled = _loc3_.visible = false;
-         _loc3_.y = _loc2_;
-         this.layerHolder.addChild(_loc3_);
-         this.lstLayers.source = this.layerHolder;
-         this.lstLayers.refreshPane();
-         this.lstLayers.update();
-         if(_loc1_ > -1)
-         {
-            this.lstLayers.verticalScrollPosition = _loc1_;
-         }
-         else
-         {
-            this.lstLayers.verticalScrollPosition = this.savedLayerScrollPosition;
-         }
-         this.savedLayerScrollPosition = 0;
-         this.updateLayerCount();
-         this.mcPreviewBox.refreshView();
-      }
-      
-      public function changeTool(param1:uint) : void
-      {
-         curTool = param1;
-         this.mcToolFollow.gotoAndStop(curTool);
-         setChildIndex(this.mcToolFollow,numChildren - 1);
-      }
-      
-      public function press_btnUndo(param1:MouseEvent) : void
-      {
-         this.pixelEditor.undo();
-      }
-      
-      function __setProp_cmbBlendModes_editor_maincontent_10() : *
-      {
-         try
-         {
-            this.cmbBlendModes["componentInspectorSetting"] = true;
-         }
-         catch(e:Error)
-         {
-         }
-         this.collObj5 = new DataProvider();
-         this.collProps5 = [];
-         this.i5 = 0;
-         while(this.i5 < this.collProps5.length)
-         {
-            this.itemObj5 = new SimpleCollectionItem();
-            this.collProp5 = this.collProps5[this.i5];
-            for(this.j5 in this.collProp5)
-            {
-               this.itemObj5[this.j5] = this.collProp5[this.j5];
-            }
-            this.collObj5.addItem(this.itemObj5);
-            ++this.i5;
-         }
-         this.cmbBlendModes.dataProvider = this.collObj5;
-         this.cmbBlendModes.editable = false;
-         this.cmbBlendModes.enabled = true;
-         this.cmbBlendModes.prompt = "";
-         this.cmbBlendModes.restrict = "";
-         this.cmbBlendModes.rowCount = 5;
-         this.cmbBlendModes.visible = true;
-         try
-         {
-            this.cmbBlendModes["componentInspectorSetting"] = false;
-         }
-         catch(e:Error)
-         {
-         }
-      }
-      
-      public function takeToEditor() : void
-      {
-         curSkin = new Skin();
-         curSkin.baseBitmapData = this.mcPreviewBox.sourceBitmapData.clone();
-         this.editorFirstInit = true;
-         this.cleanupMenuBrowse();
-         gotoAndStop("edit_main","editor");
-      }
-      
-      public function changeEditorView(param1:Event) : void
-      {
-      }
-      
-      public function listenForLoad(param1:Event) : void
-      {
-         if(framesLoaded == totalFrames)
-         {
-            removeEventListener(Event.ENTER_FRAME,this.listenForLoad);
-            if(loaderInfo.parameters.NewgroundsAPI_SaveFileID)
-            {
-               this.mcPreloader.visible = false;
-               this.txtLoadingSkin.visible = true;
-               addEventListener(Event.ENTER_FRAME,this.listenForAPIConnected);
-            }
-         }
-      }
-      
-      public function press_btnArrow(param1:MouseEvent) : void
-      {
-         PremadeLayer(layerToEdit).attemptToMove(param1.target.direction);
-      }
-      
-      public function clickNgIntro(param1:MouseEvent) : void
-      {
-         Utilities.clickLink("http://newgrounds.com");
-      }
-      
-      public function changeSkinName(param1:Event) : void
-      {
-         curSkin.name = this.txtSkinName.text.substr(0,MAX_LAYER_NAME_LENGTH);
-      }
-      
-      function __setProp_cmbEditorView_editor_maincontent_11() : *
-      {
-         try
-         {
-            this.cmbEditorView["componentInspectorSetting"] = true;
-         }
-         catch(e:Error)
-         {
-         }
-         this.collObj6 = new DataProvider();
-         this.collProps6 = [];
-         this.i6 = 0;
-         while(this.i6 < this.collProps6.length)
-         {
-            this.itemObj6 = new SimpleCollectionItem();
-            this.collProp6 = this.collProps6[this.i6];
-            for(this.j6 in this.collProp6)
-            {
-               this.itemObj6[this.j6] = this.collProp6[this.j6];
-            }
-            this.collObj6.addItem(this.itemObj6);
-            ++this.i6;
-         }
-         this.cmbEditorView.dataProvider = this.collObj6;
-         this.cmbEditorView.editable = false;
-         this.cmbEditorView.enabled = true;
-         this.cmbEditorView.prompt = "";
-         this.cmbEditorView.restrict = "";
-         this.cmbEditorView.rowCount = 6;
-         this.cmbEditorView.visible = true;
-         try
-         {
-            this.cmbEditorView["componentInspectorSetting"] = false;
-         }
-         catch(e:Error)
-         {
-         }
-      }
-      
-      public function dragLayerSelection() : void
-      {
-         cursorMode = CURSOR_DRAG;
-         layerSelection.fadeAll();
-         this.updateLayers();
-         this.mcGroupIndicator.visible = true;
-         this.mcGroupIndicator.txtLayersNum.text = layerSelection.layers.length + " Layer(s)";
-      }
-      
-      public function changeColor(param1:Event) : void
-      {
-         layerToEdit.tintColor = this.colorGrabber.actualColor;
-         this.mcPreviewBox.refreshView();
-      }
-      
-      public function press_btnBackFromBrowse(param1:MouseEvent) : void
-      {
-         this.cleanupMenuBrowse();
-         gotoAndStop("main","menu");
-      }
-      
-      public function tick(param1:Event) : void
-      {
-         KeyManager.detectKeys();
-         if(listenForDrag)
-         {
-            ++dragDelayFrames;
-            if(dragDelayFrames > 7 && (mouseX != dragStartX || mouseY != dragStartY))
-            {
-               listenForDrag = false;
-               this.dragLayerSelection();
-               stage.focus = null;
-            }
-         }
-         if(cursorMode == CURSOR_DRAG)
-         {
-            if(this.lstLayers && this.lstLayers.hitTestPoint(mouseX,mouseY))
-            {
-               if(this.lstLayers.mouseY < 25)
-               {
-                  this.lstLayers.verticalScrollPosition -= 5;
-               }
-               else if(this.lstLayers.mouseY > this.lstLayers.height - 25)
-               {
-                  this.lstLayers.verticalScrollPosition += 5;
-               }
-            }
-            this.mcGroupIndicator.x = mouseX;
-            this.mcGroupIndicator.y = mouseY;
-         }
-         if(currentLabel == "edit_custom_layer")
-         {
-            if(this.pixelEditorMask && this.pixelEditor && curTool != TOOL_NONE && curTool != TOOL_EYEDROPPER)
-            {
-               if(this.pixelEditorMask.hitTestPoint(mouseX,mouseY))
-               {
-                  this.mcToolFollow.visible = true;
-               }
-               else
-               {
-                  this.mcToolFollow.visible = false;
-               }
-            }
-            if(KeyManager.singlePress(KeyManager.LTR_Z))
-            {
-               this.pixelEditor.undo();
-            }
-         }
-         if(this.mcToolFollow)
-         {
-            this.mcToolFollow.x = mouseX;
-            this.mcToolFollow.y = mouseY;
-         }
-      }
-      
-      public function press_btnDeleteSelection(param1:MouseEvent) : void
-      {
-         if(layerSelection == null)
-         {
-            return;
-         }
-         Main.newDialogBox = new DialogBox("Are you sure you want to delete " + layerSelection.layers.length + " layer(s)?");
-         Main.newDialogBox.createAsYesNo("DELLAYERGROUP");
-         Main.newDialogBox.display();
-      }
-      
-      public function press_btnAdvancedOptions(param1:MouseEvent) : void
-      {
-         if(showAdvancedOptions)
-         {
-            showAdvancedOptions = false;
-            this.btnAdvancedOptions.gotoAndStop(1);
-         }
-         else
-         {
-            showAdvancedOptions = true;
-            this.btnAdvancedOptions.gotoAndStop(2);
-         }
-      }
-      
-      public function rollOverShowSelection(param1:MouseEvent) : void
-      {
-         if(cursorMode == CURSOR_FREE)
-         {
-            showDescription("Show selected layers");
-         }
-      }
-      
-      public function opacityChange(param1:Event) : void
-      {
-         layerToEdit.opacity = uint(this.sldOpacity.value);
-         this.updateSliderDisplays();
-         this.mcPreviewBox.refreshView();
-      }
-      
-      public function cleanupMenuImportTXT() : void
-      {
-         this.mcPreviewBox.cleanup();
-         this.importFileReference.removeEventListener(Event.SELECT,this.referenceBrowse);
-         this.importFileReference.removeEventListener(Event.COMPLETE,this.referenceLoadedTXT);
-         this.importFileReference.removeEventListener(IOErrorEvent.IO_ERROR,this.ioError);
-         this.importFileReference = null;
-         this.btnBrowse.removeEventListener(MouseEvent.CLICK,this.press_btnBrowse);
-         this.btnGoImport.removeEventListener(MouseEvent.CLICK,this.press_btnImportPNG);
-         this.btnBackFromImport.removeEventListener(MouseEvent.CLICK,this.press_btnBackFromImport);
-      }
-      
-      public function press_btnAddLayer(param1:MouseEvent) : void
-      {
-         if(curSkin.layers.length == MAX_LAYERS)
-         {
-            generateOKDialog("You cannot exceed " + MAX_LAYERS + " layers");
-            return;
-         }
-         if(Utilities.saveFile.firstTime)
-         {
-            Utilities.saveFile.firstTime = false;
-            Utilities.saveGame();
-            this.mcTut1.visible = false;
-            this.btnAddLayer.filters = null;
-         }
-         this.mcLayerDialog.show();
-      }
-      
-      public function changeFlattenColor(param1:Event) : void
-      {
-         layerToEdit.flattenColor = this.chkFlattenColor.selected;
-         this.mcPreviewBox.refreshView();
-      }
-      
-      public function press_btnImportPNG(param1:MouseEvent) : void
-      {
-         this.cleanupMenuMain();
-         gotoAndStop("import_png","menu");
-      }
-      
-      public function changeBlendMode(param1:Event) : void
-      {
-         layerToEdit.blendMode = this.cmbBlendModes.selectedItem.data;
-         this.mcPreviewBox.refreshView();
-      }
-      
-      public function referenceBrowse(param1:Event) : void
-      {
-         var e:Event = param1;
-         if(this.importFileReference.size > importLimitBytes)
-         {
-            generateOKDialog("Filesize cannot exceed " + importLimitKB + "kb (" + importLimitBytes + " bytes)");
-            return;
-         }
-         this.disableImportGo();
-         this.disableBack();
-         try
-         {
-            this.importFileReference.load();
-         }
-         catch(e:Error)
-         {
-            ioError(null);
-         }
-      }
-      
-      public function press_btnClearSearch(param1:MouseEvent) : void
-      {
-         this.btnClearSearch.visible = false;
-         this.saveBrowser.title = "User Created Skins";
-         this.saveBrowser.sortField = SaveQuery.CREATED_ON;
-         this.saveBrowser.loadFiles();
-      }
-      
-      function __setProp_sldTextureIntensity_editor_maincontent_10() : *
-      {
-         try
-         {
-            this.sldTextureIntensity["componentInspectorSetting"] = true;
-         }
-         catch(e:Error)
-         {
-         }
-         this.sldTextureIntensity.direction = "horizontal";
-         this.sldTextureIntensity.enabled = true;
-         this.sldTextureIntensity.liveDragging = true;
-         this.sldTextureIntensity.maximum = 100;
-         this.sldTextureIntensity.minimum = 0;
-         this.sldTextureIntensity.snapInterval = 0;
-         this.sldTextureIntensity.tickInterval = 0;
-         this.sldTextureIntensity.value = 0;
-         this.sldTextureIntensity.visible = true;
-         try
-         {
-            this.sldTextureIntensity["componentInspectorSetting"] = false;
-         }
-         catch(e:Error)
-         {
-         }
-      }
-      
-      public function skinLoaded(param1:APIEvent) : *
-      {
-         if(param1.success)
-         {
-            ngSaveFile = SaveFile(param1.data);
-            this.mcPreviewBox.loadBase(BitmapData(ngSaveFile.data));
-            this.mcPreviewBox.refreshView();
-            this.voteBar.saveFile = ngSaveFile;
-            this.voteBar.start();
-         }
-      }
-      
-      public function finishLoadScreen() : void
-      {
-         stop();
-         this.ngIntro.buttonMode = true;
-         this.ngIntro.mouseChildren = false;
-         this.ngIntro.addEventListener(MouseEvent.CLICK,this.clickNgIntro);
-      }
-      
-      public function cleanupMenuPresets() : void
-      {
-         this.unloadPreviewBox();
-         this.lstPresets.removeEventListener(Event.CHANGE,this.showCurPreset);
-         this.lstPresets.removeEventListener(ListEvent.ITEM_DOUBLE_CLICK,this.doubleClickPreset);
-         this.btnGoPreset.removeEventListener(MouseEvent.CLICK,this.press_btnGoPreset);
-         this.btnBackFromPresets.removeEventListener(MouseEvent.CLICK,this.press_btnBackFromPresets);
-      }
-      
-      public function press_btnHideSelection(param1:MouseEvent) : void
-      {
-         if(layerSelection == null)
-         {
-            return;
-         }
-         for each(tempLayer in layerSelection.layers)
-         {
-            tempLayer.hidden = true;
-         }
-         this.updateLayers();
-      }
-      
-      function __setProp_cmbBlendModes_editor_maincontent_11() : *
-      {
-         try
-         {
-            this.cmbBlendModes["componentInspectorSetting"] = true;
-         }
-         catch(e:Error)
-         {
-         }
-         this.collObj7 = new DataProvider();
-         this.collProps7 = [];
-         this.i7 = 0;
-         while(this.i7 < this.collProps7.length)
-         {
-            this.itemObj7 = new SimpleCollectionItem();
-            this.collProp7 = this.collProps7[this.i7];
-            for(this.j7 in this.collProp7)
-            {
-               this.itemObj7[this.j7] = this.collProp7[this.j7];
-            }
-            this.collObj7.addItem(this.itemObj7);
-            ++this.i7;
-         }
-         this.cmbBlendModes.dataProvider = this.collObj7;
-         this.cmbBlendModes.editable = false;
-         this.cmbBlendModes.enabled = true;
-         this.cmbBlendModes.prompt = "";
-         this.cmbBlendModes.restrict = "";
-         this.cmbBlendModes.rowCount = 5;
-         this.cmbBlendModes.visible = true;
-         try
-         {
-            this.cmbBlendModes["componentInspectorSetting"] = false;
-         }
-         catch(e:Error)
-         {
-         }
-      }
-      
-      public function initMenuPresets() : void
-      {
-         var _loc1_:PresetSkin = null;
-         this.loadPreviewBox(355,63);
-         for each(_loc1_ in presetSkins)
-         {
-            this.lstPresets.addItem({
-               "label":_loc1_.name,
-               "data":_loc1_.id
-            });
-         }
-         this.lstPresets.selectedIndex = 0;
-         this.lstPresets.addEventListener(Event.CHANGE,this.showCurPreset);
-         this.lstPresets.addEventListener(ListEvent.ITEM_DOUBLE_CLICK,this.doubleClickPreset);
-         this.lstPresets.doubleClickEnabled = true;
-         this.showCurPreset();
-         this.btnGoPreset.buttonMode = true;
-         this.btnGoPreset.addEventListener(MouseEvent.CLICK,this.press_btnGoPreset);
-         Utilities.mc2Btn(this.btnBackFromPresets);
-         this.btnBackFromPresets.addEventListener(MouseEvent.CLICK,this.press_btnBackFromPresets);
-      }
-      
-      public function doubleClickPreset(param1:ListEvent) : void
-      {
-         this.press_btnGoPreset(null);
-      }
-      
-      public function initMenuBrowse() : void
-      {
-         Utilities.mc2Btn(this.btnBackFromBrowse);
-         this.btnBackFromBrowse.addEventListener(MouseEvent.CLICK,this.press_btnBackFromBrowse);
-         Utilities.mc2Btn(this.btnSearch);
-         this.btnSearch.addEventListener(MouseEvent.CLICK,this.press_btnSearch);
-         Utilities.mc2Btn(this.btnClearSearch);
-         this.btnClearSearch.addEventListener(MouseEvent.CLICK,this.press_btnClearSearch);
-         this.btnClearSearch.visible = false;
-         this.loadPreviewBox(420,63,1);
-         this.mcPreviewBox.initBrowseMode();
-         setChildIndex(this.voteBar,numChildren - 1);
-         API.addEventListener(APIEvent.FILE_LOADED,this.skinLoaded);
-         API.addEventListener(APIEvent.VOTE_COMPLETE,this.voteComplete);
-         if(preloadNGSaveFile)
-         {
-            this.mcPreviewBox.loadBase(BitmapData(preloadNGSaveFile.data));
-            this.mcPreviewBox.refreshView();
-            this.voteBar.saveFile = preloadNGSaveFile;
-            this.voteBar.start();
-            preloadNGSaveFile = null;
-         }
-      }
-      
-      public function disableBack() : void
-      {
-         this.btnBackFromImport.mouseEnabled = false;
-         this.btnBackFromImport.alpha = 0.2;
-         if(this.btnLoad)
-         {
-            this.btnLoad.mouseEnabled = false;
-            this.btnLoad.alpha = 0.2;
-         }
-      }
-      
-      public function updateLayerCount() : void
-      {
-         this.txtLayerCount.text = curSkin.layers.length + "/" + MAX_LAYERS;
-      }
-   }
+  import com.adobe.protocols.dict.events.ConnectedEvent;
+  import com.newgrounds.components.VoteBar;
+  import fl.accessibility.CheckBoxAccImpl;
+  import fl.containers.ScrollPane;
+  import fl.controls.Button;
+  import fl.controls.CheckBox;
+  import fl.controls.ComboBox;
+  import fl.controls.List;
+  import fl.controls.Slider;
+  import fl.controls.TextArea;
+  import fl.controls.TextInput;
+  import fl.events.ListEvent;
+  import fl.events.SliderEvent;
+  import flash.display.Bitmap;
+  import flash.display.BitmapData;
+  import flash.display.Loader;
+  import flash.display.MovieClip;
+  import flash.display.Sprite;
+  import flash.display.Stage;
+  import flash.filters.BlurFilter;
+  import flash.filters.GlowFilter;
+  import flash.media.Sound;
+  
+  import flash.display.BlendMode;
+  import flash.events.Event;
+  import flash.events.MouseEvent;
+  import flash.geom.Rectangle;
+  import flash.net.FileFilter;
+  import flash.net.FileReference;
+  import flash.text.TextField;
+  import flash.ui.Mouse;
+  import flash.utils.ByteArray;
+  import fl.controls.ScrollPolicy;
+  import flash.utils.getDefinitionByName;
+  import flash.net.registerClassAlias;
+  import flash.events.IOErrorEvent;
+  
+  import com.newgrounds.components.SaveBrowser;
+  import com.newgrounds.components.MedalPopup;
+  import com.newgrounds.API;
+  import com.newgrounds.APIEvent;
+  import com.newgrounds.Medal;
+  import com.newgrounds.SaveQuery;
+  
+  public class Main extends MovieClip
+  {
+    public static var rootRef:Main;
+    public static var stageRef:Stage;
+    public static var GAME_WIDTH:uint;
+    public static var GAME_HEIGHT:uint;
+    public static var curSkin:Skin;
+    public static var dummySkin:Skin; //used for previewing single layers
+    public static var activeDialogBox:DialogBox;
+    public static var newDialogBox:DialogBox;
+    public static var importLimitBytes:uint;
+    public static var importLimitKB:uint;
+    public static var surfaces:Vector.<Surface>;
+    public static var presetSkins:Vector.<PresetSkin>;
+    public static var tempSurface:Surface;
+    public static var categories:Array;
+    public static var subcategories:Array;
+    public static var tempCategory:Category;
+    public static var tempSubcategory:Subcategory;
+    public static var pieces:Array;
+    public static var tempPiece:Piece;
+    public static var tempLayer:Layer;
+    public static var tempLayerBox:LayerBox;
+    public static var tempPresetSkin:PresetSkin;
+    public static var layerBoxes:Vector.<LayerBox>;
+    public static var layerToDelete:Layer;
+    public static var layerToEdit:Layer;
+    public static var cursorMode:uint;
+    public static var availableBlendModes:Array;
+    public static var savedView:uint; //for the mc preview box
+    public static var showAdvancedOptions:Boolean;
+    public static var hasSeenAd:Boolean;
+    public static var savedBG:uint;
+    public static var i:int, j:int;
+    public static var medalPopup:MedalPopup;
+    public var ngIntro:MovieClip;
+    public var txtTest:TextField;
+    public var txtLoadingSkin:MovieClip;
+    public var mcPreloader:MovieClip;
+    public var btnSkincraftPack:MovieClip;
+    
+    public static var dragDelayFrames:uint;
+    public static var dragStartX:Number;
+    public static var dragStartY:Number;
+    public static var listenForDrag:Boolean;
+    
+    //sfx
+    public static var sfxBtnHover:Sound;
+    public static var sfxBtnClick:Sound;
+    
+    //menus
+    public var btnPresets:MovieClip;
+    public var btnImportPNG:MovieClip;
+    public var btnImportTXT:MovieClip;
+    public var btnBrowseUploads:MovieClip;
+    public var mcTankLogo:MovieClip;
+    
+    public var btnBackFromPresets:MovieClip;
+    public var btnGoPreset:MovieClip;
+    public var lstPresets:List;
+    
+    public var btnBrowse:MovieClip;
+    public var btnBackFromImport:MovieClip;
+    public var btnGoImport:MovieClip;
+    public var importSourceContainer:Sprite;
+    public var importSourceBitmap:Bitmap;
+    public var importFileReference:FileReference;
+    public var importLoader:Loader;
+    
+    public var btnBackFromBrowse:MovieClip;
+    public var saveBrowser:SaveBrowser;
+    public static var ngSaveFile:com.newgrounds.SaveFile;
+    public static var preloadNGSaveFile:com.newgrounds.SaveFile;
+    public var voteBar:VoteBar;
+    public var btnSearch:MovieClip;
+    public var btnClearSearch:MovieClip;
+    public var mcSearchDialog:SearchDialog;
+    
+    //editor
+    public var mcDirtBG:MovieClip;
+    public var mcPanel:MovieClip;
+    public var savedLayerScrollPosition:Number;
+    public var editorFirstInit:Boolean;
+    public var btnBackFromEditor:MovieClip;
+    public var sourceContainer:Sprite;
+    public var sourceBitmap:Bitmap;
+    public var previewContainer:Sprite;
+    public var btnExport:MovieClip;
+    public var mcPreviewBox:PreviewBox;
+    public var txtLayerCount:TextField;
+    public var txtDescription:TextField;
+    public var btnAddLayer:MovieClip;
+    public var lstLayers:ScrollPane;
+    public var txtSkinName:TextInput;
+    public var mcLayerDialog:LayerDialog;
+    public var mcExportDialog:ExportDialog;
+    public var layerHolder:Sprite;
+    public var btnCopyLayer:MovieClip;
+    public var btnShowSelection:MovieClip;
+    public var btnHideSelection:MovieClip;
+    public var btnDeleteSelection:MovieClip;
+    public var mcGroupIndicator:MovieClip;
+    public static var layerSelection:LayerSelection;
+    
+    //tutorial
+    public var mcTut1:MovieClip;
+    public var mcTut2:MovieClip;
+    
+    //edit layer
+    public var txtLayerName:TextInput;
+    public var btnBackToLayers:MovieClip;
+    public var sldOpacity:Slider;
+    public var txtOpacityValue:TextField;
+    public var colorGrabber:ColorGrabber;
+    public var btnArrowUp:MovieClip, btnArrowRight:MovieClip, btnArrowDown:MovieClip, btnArrowLeft:MovieClip;
+    public var chkInvertX:CheckBox;
+    public var chkInvertY:CheckBox;
+    public var btnAdvancedOptions:MovieClip;
+    public var sldColorIntensity:Slider;
+    public var sldTextureIntensity:Slider;
+    public var txtColorIntensity:TextField;
+    public var txtTextureIntensity:TextField;
+    public var mcAdvancedLabels:MovieClip;
+    public var sldBlur:Slider;
+    public var txtBlurValue:TextField;
+    public var chkFlattenColor:CheckBox;
+    public var mcNotAvailable:MovieClip;
+    public var mcMovementExtra:MovieClip;
+    
+    //edit custom layer
+    public var pixelEditor:PixelEditor;
+    public var btnPencil:MovieClip;
+    public var btnEraser:MovieClip;
+    public var btnBucket:MovieClip;
+    public var btnUndo:MovieClip;
+    public var mcToolFollow:MovieClip;
+    public var chkShowBase:CheckBox;
+    public var cmbEditorView:ComboBox;
+    public var txtSurfaceName:TextField;
+    public var txtSpecialMessage:TextField;
+    public var mcLabelBlur:MovieClip;
+    public var mcLabelOpacity:MovieClip;
+    public var cmbBlendModes:ComboBox;
+    public var mcShiftMessage:MovieClip;
+    public static var curTool:uint;
+    
+    //consts
+    public static const SKIN_WIDTH:uint = 64;
+    public static const SKIN_HEIGHT:uint = 32;
+    public static const MAX_LAYERS:uint = 50;
+    public static const MAX_LAYER_NAME_LENGTH:uint = 30;
+    public static const UP:uint = 0; //these are used for changing the arrow
+    public static const DOWN:uint = 1;
+    public static const LEFT:uint = 2;
+    public static const RIGHT:uint = 3;
+    public static const CURSOR_FREE:uint = 0;
+    public static const CURSOR_DRAG:uint = 1;
+    public static const CURSOR_DRAW:uint = 2;
+    public static const TOOL_NONE:uint = 0;
+    public static const TOOL_PENCIL:uint = 1;
+    public static const TOOL_ERASER:uint = 2;
+    public static const TOOL_BUCKET:uint = 3;
+    public static const TOOL_EYEDROPPER:uint = 4;
+    
+    public function Main():void
+    {			
+      //stop on first frame, let preloader take over, set main vars
+      stop();
+      rootRef = this;
+      stageRef = stage;
+      GAME_WIDTH = stage.stageWidth;
+      GAME_HEIGHT = stage.stageHeight;
+      importLimitKB = 50;
+      importLimitBytes = importLimitKB * 1024;
+      tabEnabled = tabChildren = false;
+      hasSeenAd = false;
+      savedBG = 1;
+      txtLoadingSkin.visible = false;
+      
+      mcTankLogo.buttonMode = true;
+      mcTankLogo.addEventListener(MouseEvent.CLICK, clickTank);
+      
+      Utilities.mc2Btn(btnSkincraftPack);
+      btnSkincraftPack.addEventListener(MouseEvent.CLICK, clickSkincraftPack);
+      
+      //if on kongregate, set seen ad to true
+      var siteURL:String = loaderInfo.loaderURL;
+      var adFreeSites:RegExp = /(kongregate|addictinggames)/i;
+      //if(siteURL.search(adFreeSites) == -1) adSwitcher.nextFrame();
+      if(siteURL.match(adFreeSites)) hasSeenAd = true;
+      
+      registerClassAlias("Skin", Skin);
+      registerClassAlias("Layer", Layer);
+      registerClassAlias("PremadeLayer", PremadeLayer);
+      registerClassAlias("CustomLayer", CustomLayer);
+      registerClassAlias("Piece", Piece);
+      
+      //context menu and bounds
+      Utilities.setRefs(this, stage);
+      contextMenu = Utilities.generateContextMenu();
+      addChild(Utilities.createOutsideBounds(GAME_WIDTH, GAME_HEIGHT));
+      
+      Utilities.loadSharedObject("SKINCRAFT");
+      //Utilities.createNewSaveFile();
+      
+      //create stuff
+      createPresetSkins();
+      createSurfaces();
+      createCategories();
+      
+      //pieces are done in separate file
+      pieces = new Array();
+      include "create_pieces.as";
+      //pieces.push(new Piece("Hair 1", Subcategory.HAIR, new Array(Surface.HEAD_FRONT,-1), false ));
+      pieces.sortOn("name");
+      
+      //blend modes
+      availableBlendModes = new Array(BlendMode.NORMAL, BlendMode.OVERLAY, BlendMode.MULTIPLY, BlendMode.SCREEN);
+      
+      //start up key manager and global tick
+      KeyManager.init();
+      addEventListener(Event.ENTER_FRAME, tick);
+      
+      //set up listener for mouse up and lose focus to assist with layer dragging
+      stage.addEventListener(MouseEvent.MOUSE_UP, mouseUp);
+      stage.addEventListener(Event.DEACTIVATE, gameLoseFocus);
+      
+      //default saved view
+      savedView = PreviewBox.VIEW_FRONT;
+      
+      //keep a medal popup handy on the stage
+      medalPopup = new MedalPopup();
+      medalPopup.x = 225;
+      medalPopup.y = 318;
+      addChild(medalPopup);
+      
+      //listen for the load
+      addEventListener(Event.ENTER_FRAME, listenForLoad);
+      
+      //sound objects
+      sfxBtnClick = new button_click();
+      sfxBtnHover = new button_hover();
+    }
+    
+    public function listenForLoad(e:Event):void
+    {
+      if(framesLoaded == totalFrames)
+      {
+        removeEventListener(Event.ENTER_FRAME, listenForLoad);
+        
+        //if(true)
+        if(loaderInfo.parameters.NewgroundsAPI_SaveFileID)
+        {
+          mcPreloader.visible = false;
+          txtLoadingSkin.visible = true;
+          addEventListener(Event.ENTER_FRAME, listenForAPIConnected);
+        }
+      }
+    }
+    
+    public function listenForAPIConnected(e:Event):void
+    {
+      if(API.connected)
+      {
+        removeEventListener(Event.ENTER_FRAME, listenForAPIConnected);
+        API.loadSaveFile(loaderInfo.parameters.NewgroundsAPI_SaveFileID);
+        //API.loadSaveFile(54680);
+        API.addEventListener(APIEvent.FILE_LOADED, preskinLoaded);
+      }
+    }
+    
+    public function preskinLoaded(event:APIEvent) 
+    {
+      if(event.success) 
+      {
+        //this is for taking it to the browse/vote area
+        preloadNGSaveFile = com.newgrounds.SaveFile(event.data);
+        gotoAndStop("browse", "menu");
+        
+        /* this is for taking a preloaded skin to the editor
+        curSkin = new Skin();
+        curSkin.baseBitmapData = BitmapData(preloadNGSaveFile.data);
+        editorFirstInit = true;
+        gotoAndStop("edit_main", "editor");
+        */
+      }
+      
+      API.removeEventListener(APIEvent.FILE_LOADED, preskinLoaded);
+    }
+    
+    public function clickTank(e:MouseEvent):void
+    {
+      Utilities.clickLink("http://newgrounds.com");
+    }
+    
+    public function clickSkincraftPack(e:MouseEvent):void
+    {
+      Utilities.clickLink("http://afro-ninja.com/skincraft");
+    }
+    
+    public function tick(e:Event):void
+    {
+      KeyManager.detectKeys();
+      
+      //listening to start drag?
+      if(listenForDrag)
+      {
+        dragDelayFrames++;
+        
+        if(dragDelayFrames > 7 && (mouseX != dragStartX || mouseY != dragStartY))
+        {
+          listenForDrag = false;
+          dragLayerSelection();
+          stage.focus = null;
+        }
+      }
+      
+      //actually dragging?
+      if(cursorMode == CURSOR_DRAG)
+      {
+        //auto scroll the layer list
+        if(lstLayers && lstLayers.hitTestPoint(mouseX,mouseY))
+        {
+          if(lstLayers.mouseY < 25) lstLayers.verticalScrollPosition -= 5;
+          else if(lstLayers.mouseY > lstLayers.height - 25) lstLayers.verticalScrollPosition += 5;
+        }
+        
+        //move the layer group indication box with the mouse
+        mcGroupIndicator.x = mouseX;
+        mcGroupIndicator.y = mouseY;
+      }
+      
+      //special functionality for pixel editor
+      if(currentLabel == "edit_custom_layer")
+      {
+        //hide the mouse if it's over top of the editor window and we have a tool
+        if(pixelEditor && curTool != TOOL_NONE && curTool != TOOL_EYEDROPPER)
+        {
+          if(pixelEditor.hitTestPoint(mouseX, mouseY)){
+            //Mouse.hide();
+            mcToolFollow.visible = true;
+          }
+          else {
+            //Mouse.show();
+            mcToolFollow.visible = false;
+          }
+        }
+        
+        //if they pressed z, attempt an undo
+        if(KeyManager.singlePress(KeyManager.LTR_Z))
+        {
+          pixelEditor.undo();
+        }
+      }
+      
+      //tool always follows the mouse
+      if(mcToolFollow)
+      {
+        mcToolFollow.x = mouseX;
+        mcToolFollow.y = mouseY;
+      }
+      
+      //if in the main editor, listen for a ctrl+a for select all
+      return;
+      if(currentLabel == "edit_main")
+      {
+        if(KeyManager.pressingCTRL)
+        {
+          if(KeyManager.singlePress(KeyManager.LTR_A))
+          {
+            selectAllLayers();
+            updateLayers();
+          }
+        }
+      }
+    }
+    
+    //mouse up is used for detecting layer drag
+    public function mouseUp(e:MouseEvent):void
+    {
+      //cancel drag listen, see if we have a selection to change
+      listenForDrag = false;
+      if(cursorMode == CURSOR_DRAG)
+      {
+        //is there a layer box that is eligible for insertion?
+        var boxEligibleForInsertion:LayerBox = null;
+        for each(tempLayerBox in layerBoxes)
+        {
+          if(tempLayerBox.eligibleForInsertion)
+          {
+            boxEligibleForInsertion = tempLayerBox;
+            break;
+          }
+        }
+        
+        //if so, move the selection.
+        if(boxEligibleForInsertion)
+        {
+          //move, update layers, update layer range (layer indexes have change)
+          curSkin.moveLayerSelection(boxEligibleForInsertion);
+          updateLayers();
+          layerSelection.setRange(layerSelection.range);
+        }
+        
+        //stop the drag regardless, this will reset everything
+        stopDragLayerSelection();
+      }
+      
+      //if we were drawing, cancel it
+      if(cursorMode == CURSOR_DRAW) cursorMode = CURSOR_FREE;
+      
+      //always try to hide the "shift for straight lines" message if it exists
+      if(mcShiftMessage) mcShiftMessage.visible = false;
+    }
+    
+    public function gameLoseFocus(e:Event):void
+    {
+      //cancel the drag
+      listenForDrag = false;
+      if(cursorMode == CURSOR_DRAG)
+      {
+        stopDragLayerSelection();
+      }
+      
+      //if we were drawing, cancel it
+      if(cursorMode == CURSOR_DRAW) cursorMode = CURSOR_FREE;
+      
+      //cancel all keys
+      KeyManager.releaseAllKeys();
+    }
+    
+    public function startListeningForGroupDrag():void
+    {
+      dragDelayFrames = 0;
+      dragStartX = mouseX;
+      dragStartY = mouseY;
+      listenForDrag = true;
+    }
+    
+    public function finishLoadScreen():void
+    {
+      /*
+      ngIntro.stop();
+      transitionToMenu();
+      return;*/
+      
+      stop();
+      ngIntro.buttonMode = true;
+      ngIntro.mouseChildren = false;
+      ngIntro.addEventListener(MouseEvent.CLICK, clickNgIntro);
+    }
+    
+    public function clickNgIntro(e:MouseEvent):void
+    {
+      Utilities.clickLink("http://newgrounds.com");
+    }
+    
+    public function transitionToMenu():void
+    {
+      gotoAndStop("main","menu");
+    }
+    
+    public function createPresetSkins():void 
+    {
+      presetSkins = new Vector.<PresetSkin>;
+      presetSkins.push(new PresetSkin(0, "Blank"));
+      presetSkins.push(new PresetSkin(1, "Minecraft Guy"));
+      presetSkins.push(new PresetSkin(2, "Skin 1"));
+      presetSkins.push(new PresetSkin(3, "Skin 2"));
+      presetSkins.push(new PresetSkin(4, "Skin 3"));
+      presetSkins.push(new PresetSkin(5, "Robot"));
+    }
+    
+    public function createSurfaces():void
+    {
+      surfaces = new Vector.<Surface>;
+      surfaces.push(new Surface(Surface.HEAD_LEFT, "Head Left", new Rectangle(0,8,8,8), PreviewBox.VIEW_LEFT));
+      surfaces.push(new Surface(Surface.HEAD_FRONT, "Head Front", new Rectangle(8,8,8,8), PreviewBox.VIEW_FRONT));
+      surfaces.push(new Surface(Surface.HEAD_RIGHT, "Head Right", new Rectangle(16,8,8,8), PreviewBox.VIEW_RIGHT));
+      surfaces.push(new Surface(Surface.HEAD_BACK, "Head Back", new Rectangle(24,8,8,8), PreviewBox.VIEW_BACK));
+      surfaces.push(new Surface(Surface.HEAD_TOP, "Head Top", new Rectangle(8,0,8,8), PreviewBox.VIEW_TOP));
+      surfaces.push(new Surface(Surface.HEAD_BOTTOM, "Head Bottom", new Rectangle(16,0,8,8), PreviewBox.VIEW_BOTTOM));
+      
+      surfaces.push(new Surface(Surface.ARM_LEFT, "Arm Outside", new Rectangle(40,20,4,12), PreviewBox.VIEW_LEFT));
+      surfaces.push(new Surface(Surface.ARM_FRONT, "Arm Front", new Rectangle(44,20,4,12), PreviewBox.VIEW_FRONT));
+      surfaces.push(new Surface(Surface.ARM_RIGHT, "Arm Inside", new Rectangle(48,20,4,12), PreviewBox.VIEW_RIGHT));
+      surfaces.push(new Surface(Surface.ARM_BACK, "Arm Back", new Rectangle(52,20,4,12), PreviewBox.VIEW_BACK));
+      surfaces.push(new Surface(Surface.ARM_TOP, "Arm Top", new Rectangle(44,16,4,4), PreviewBox.VIEW_TOP));
+      surfaces.push(new Surface(Surface.ARM_BOTTOM, "Arm Bottom", new Rectangle(48,16,4,4), PreviewBox.VIEW_BOTTOM));
+      
+      surfaces.push(new Surface(Surface.BODY_LEFT, "Body Left", new Rectangle(16,20,4,12), PreviewBox.VIEW_LEFT));
+      surfaces.push(new Surface(Surface.BODY_FRONT, "Body Front", new Rectangle(20,20,8,12), PreviewBox.VIEW_FRONT));
+      surfaces.push(new Surface(Surface.BODY_RIGHT, "Body Right", new Rectangle(28,20,4,12), PreviewBox.VIEW_RIGHT));
+      surfaces.push(new Surface(Surface.BODY_BACK, "Body Back", new Rectangle(32,20,8,12), PreviewBox.VIEW_BACK));
+      surfaces.push(new Surface(Surface.BODY_TOP, "Body Top", new Rectangle(20,16,8,4), PreviewBox.VIEW_TOP));
+      surfaces.push(new Surface(Surface.BODY_BOTTOM, "Body Bottom", new Rectangle(28,16,8,4), PreviewBox.VIEW_BOTTOM));
+      
+      surfaces.push(new Surface(Surface.LEG_LEFT, "Leg Outside", new Rectangle(0,20,4,12), PreviewBox.VIEW_LEFT));
+      surfaces.push(new Surface(Surface.LEG_FRONT, "Leg Front", new Rectangle(4,20,4,12), PreviewBox.VIEW_FRONT));
+      surfaces.push(new Surface(Surface.LEG_RIGHT, "Leg Inside", new Rectangle(8,20,4,12), PreviewBox.VIEW_RIGHT));
+      surfaces.push(new Surface(Surface.LEG_BACK, "Leg Back", new Rectangle(12,20,4,12), PreviewBox.VIEW_BACK));
+      surfaces.push(new Surface(Surface.LEG_TOP, "Leg Top", new Rectangle(4,16,4,4), PreviewBox.VIEW_TOP));
+      surfaces.push(new Surface(Surface.LEG_BOTTOM, "Leg Bottom", new Rectangle(8,16,4,4), PreviewBox.VIEW_BOTTOM));
+      
+      surfaces.push(new Surface(Surface.HAT_LEFT, "Hat Left", new Rectangle(32,8,8,8), PreviewBox.VIEW_LEFT));
+      surfaces.push(new Surface(Surface.HAT_FRONT, "Hat Front", new Rectangle(40,8,8,8), PreviewBox.VIEW_FRONT));
+      surfaces.push(new Surface(Surface.HAT_RIGHT, "Hat Right", new Rectangle(48,8,8,8), PreviewBox.VIEW_RIGHT));
+      surfaces.push(new Surface(Surface.HAT_BACK, "Hat Back", new Rectangle(56,8,8,8), PreviewBox.VIEW_BACK));
+      surfaces.push(new Surface(Surface.HAT_TOP, "Hat Top", new Rectangle(40,0,8,8), PreviewBox.VIEW_TOP));
+      surfaces.push(new Surface(Surface.HAT_BOTTOM, "Hat Bottom", new Rectangle(48,0,8,8), PreviewBox.VIEW_BOTTOM));
+    }
+    
+    public function createCategories():void
+    {
+      //main categories
+      categories = new Array();
+      categories.push(new Category(Category.HEAD, "Head"));
+      categories.push(new Category(Category.UPPER_BODY, "Upper Body"));
+      categories.push(new Category(Category.LOWER_BODY, "Lower Body"));
+      categories.push(new Category(Category.FULL, "Full Character"));
+      
+      //categories.sortOn("name");
+      
+      //sub categories
+      subcategories = new Array();
+      subcategories.push(new Subcategory(Subcategory.FACE, "Face", Category.HEAD));
+      subcategories.push(new Subcategory(Subcategory.HAIR, "Hair", Category.HEAD));
+      subcategories.push(new Subcategory(Subcategory.HATS_AND_MASKS, "Hats and Masks", Category.HEAD));
+      subcategories.push(new Subcategory(Subcategory.GLASSES, "Glasses", Category.HEAD));
+      subcategories.push(new Subcategory(Subcategory.ACCESSORY_HEAD, "Accessories", Category.HEAD));
+      //subcategories.push(new Subcategory(Subcategory.HEAD_SHAPES, "Shapes", Category.HEAD));
+      
+      subcategories.push(new Subcategory(Subcategory.SHIRTS_AND_TIES, "Shirts and Tops", Category.UPPER_BODY));
+      subcategories.push(new Subcategory(Subcategory.COATS, "Coats", Category.UPPER_BODY));
+      subcategories.push(new Subcategory(Subcategory.GLOVES, "Gloves", Category.UPPER_BODY));
+      subcategories.push(new Subcategory(Subcategory.TUNICS, "Tunics", Category.UPPER_BODY));
+      subcategories.push(new Subcategory(Subcategory.CAPES, "Capes and Cloaks", Category.UPPER_BODY));
+      subcategories.push(new Subcategory(Subcategory.BELTS, "Belts", Category.UPPER_BODY));
+      subcategories.push(new Subcategory(Subcategory.PACKS, "Packs", Category.UPPER_BODY));
+      subcategories.push(new Subcategory(Subcategory.SYMBOLS, "Symbols", Category.UPPER_BODY));
+      subcategories.push(new Subcategory(Subcategory.ACCESSORY_UPPER, "Accessories", Category.UPPER_BODY));
+      
+      subcategories.push(new Subcategory(Subcategory.PANTS, "Pants and Bottoms", Category.LOWER_BODY));
+      subcategories.push(new Subcategory(Subcategory.SHOES, "Shoes", Category.LOWER_BODY));
+      subcategories.push(new Subcategory(Subcategory.SKIRTS, "Skirts", Category.LOWER_BODY));
+      subcategories.push(new Subcategory(Subcategory.ACCESSORY_LOWER, "Accessories", Category.LOWER_BODY));
+      
+      subcategories.push(new Subcategory(Subcategory.TEXTURES, "Textures", Category.FULL));
+      
+      //subcategories.sortOn("name");
+    }
+    
+    public static function getSurface(surfaceID:uint):Surface
+    {
+      for each(tempSurface in surfaces)
+      {
+        if(tempSurface.id == surfaceID) return tempSurface;
+      }
+      return null;
+    }
+    
+    public static function getCategory(categoryID:uint):Category
+    {
+      for each(tempCategory in categories)
+      {
+        if(tempCategory.id == categoryID) return tempCategory;
+      }
+      return null;
+    }
+    
+    public static function getSubcategory(subcategoryID:uint):Subcategory
+    {
+      for each(tempSubcategory in subcategories)
+      {
+        if(tempSubcategory.id == subcategoryID) return tempSubcategory;
+      }
+      return null;
+    }
+    
+    public static function getPiece(pieceID:uint):Piece
+    {
+      for each(tempPiece in pieces)
+      {
+        if(tempPiece.id == pieceID) return tempPiece;
+      }
+      return null;
+    }
+    
+    public static function getPresetSkin(skinID:uint):PresetSkin
+    {
+      for each(tempPresetSkin in presetSkins)
+      {
+        if(tempPresetSkin.id == skinID) return tempPresetSkin;
+      }
+      return null;
+    }
+    
+/**************************************************************************************************************
+ *  MENUS
+ * ***********************************************************************************************************/
+
+    //MAIN MENU
+    public function initMenuMain():void
+    {
+      //API.debugMode = API.DEBUG_MODE_LOGGED_IN;
+      mcTankLogo.buttonMode = true;
+      mcTankLogo.addEventListener(MouseEvent.CLICK, clickTank);
+      
+      btnPresets.addEventListener(MouseEvent.CLICK, press_btnPresets);
+      btnImportPNG.addEventListener(MouseEvent.CLICK, press_btnImportPNG);
+      btnImportTXT.addEventListener(MouseEvent.CLICK, press_btnImportTXT);
+      btnBrowseUploads.addEventListener(MouseEvent.CLICK, press_btnBrowseUploads);
+      
+      Utilities.mc2Btn(btnPresets);
+      Utilities.mc2Btn(btnImportPNG);
+      Utilities.mc2Btn(btnImportTXT);
+      Utilities.mc2Btn(btnBrowseUploads);
+    }
+    
+    public function cleanupMenuMain():void
+    {
+      mcTankLogo.removeEventListener(MouseEvent.CLICK, clickTank);
+      
+      btnPresets.removeEventListener(MouseEvent.CLICK, press_btnPresets);
+      btnImportPNG.removeEventListener(MouseEvent.CLICK, press_btnImportPNG);
+      btnImportTXT.removeEventListener(MouseEvent.CLICK, press_btnImportTXT);
+      
+      Utilities.cleanupMCBtn(btnPresets);
+      Utilities.cleanupMCBtn(btnImportPNG);
+      Utilities.cleanupMCBtn(btnImportTXT);
+      Utilities.cleanupMCBtn(btnBrowseUploads);
+    }
+    
+    public function genericMouseOver(e:MouseEvent):void { sfxBtnHover.play(); MovieClip(e.currentTarget).gotoAndStop(2); }
+    public function genericMouseOut(e:MouseEvent):void{MovieClip(e.currentTarget).gotoAndStop(1);}
+    
+    public function press_btnPresets(e:MouseEvent):void
+    {
+      cleanupMenuMain();
+      gotoAndStop("presets","menu");
+    }
+    
+    public function press_btnImportPNG(e:MouseEvent):void
+    {
+      cleanupMenuMain();
+      gotoAndStop("import_png","menu");
+    }
+    
+    public function press_btnImportTXT(e:MouseEvent):void
+    {
+      cleanupMenuMain();
+      gotoAndStop("import_txt","menu");
+    }
+    
+    public function press_btnBrowseUploads(e:MouseEvent):void
+    {
+      //make sure they're connected to the api
+      if(!API.connected)
+      {
+        generateOKDialog("You are not connected to the Newgrounds API");
+        return;
+      }
+      
+      cleanupMenuMain();
+      gotoAndStop("browse","menu");
+    }
+    
+/**************************************************************************************************************
+ *  PRESETS MENU
+ * ***********************************************************************************************************/
+
+    public function initMenuPresets():void
+    {
+      //load preview box
+      loadPreviewBox(355,63);
+      
+      //populate from vector of presets
+      for each(var presetSkin:PresetSkin in presetSkins)
+      {
+        lstPresets.addItem({label:presetSkin.name, data:presetSkin.id});
+      }
+      
+      lstPresets.selectedIndex = 0;
+      lstPresets.addEventListener(Event.CHANGE, showCurPreset);
+      lstPresets.addEventListener(ListEvent.ITEM_DOUBLE_CLICK, doubleClickPreset);
+      lstPresets.doubleClickEnabled = true;
+      showCurPreset();
+      
+      btnGoPreset.buttonMode = true;
+      btnGoPreset.addEventListener(MouseEvent.CLICK, press_btnGoPreset);
+      Utilities.mc2Btn(btnBackFromPresets);
+      btnBackFromPresets.addEventListener(MouseEvent.CLICK, press_btnBackFromPresets);
+    }
+    
+    public function doubleClickPreset(e:ListEvent):void
+    {
+      press_btnGoPreset(null);
+    }
+    
+    public function showCurPreset(e:Event=null):void
+    {
+      savedView = PreviewBox.VIEW_FRONT;
+      var curSkin:PresetSkin = getPresetSkin(lstPresets.selectedItem.data);
+      mcPreviewBox.loadBase(curSkin.getBitmapData());
+      mcPreviewBox.refreshView();
+    }
+    
+    public function press_btnBackFromPresets(e:MouseEvent):void
+    {
+      cleanupMenuPresets();
+      gotoAndStop("main","menu");
+    }
+    
+    public function press_btnGoPreset(e:MouseEvent):void
+    {
+      //grab the bitmapdata that's in the preview box
+      curSkin = new Skin();
+      curSkin.baseBitmapData = mcPreviewBox.sourceBitmapData.clone();
+      editorFirstInit = true;
+      
+      cleanupMenuPresets();
+      sfxBtnClick.play();
+      gotoAndStop("edit_main","editor");
+    }
+    
+    public function cleanupMenuPresets():void
+    {
+      //mcPreviewBox.cleanup();
+      unloadPreviewBox();
+      lstPresets.removeEventListener(Event.CHANGE, showCurPreset);
+      lstPresets.removeEventListener(ListEvent.ITEM_DOUBLE_CLICK, doubleClickPreset);
+      btnGoPreset.removeEventListener(MouseEvent.CLICK, press_btnGoPreset);
+      btnBackFromPresets.removeEventListener(MouseEvent.CLICK, press_btnBackFromPresets);
+    }
+    
+/**************************************************************************************************************
+ *  IMPORT PNG MENU
+ * ***********************************************************************************************************/
+
+    public function initMenuImportPNG():void
+    {
+      btnGoImport.buttonMode = true;
+      btnGoImport.addEventListener(MouseEvent.CLICK, press_btnGoImport);
+      disableImportGo();
+      
+      btnBackFromImport.buttonMode = true;
+      btnBackFromImport.addEventListener(MouseEvent.CLICK, press_btnBackFromImport);
+      
+      btnBrowse.addEventListener(MouseEvent.CLICK, press_btnBrowse);
+      btnBrowse.buttonMode = true;
+      importFileReference = new FileReference();
+      importFileReference.addEventListener(Event.SELECT, referenceBrowse);
+      importFileReference.addEventListener(Event.COMPLETE, referenceLoaded);
+      importFileReference.addEventListener(IOErrorEvent.IO_ERROR, ioError);
+      
+      importLoader = new Loader();
+      importLoader.contentLoaderInfo.addEventListener(Event.COMPLETE, fileLoaded);
+    }
+    
+    public function press_btnBrowse(e:MouseEvent):void
+    {
+      var fileFilters:Array = new Array();
+      if(currentLabel == "import_png")
+      {
+        var pngFilter:FileFilter = new FileFilter("PNG Images", "*.png");
+        fileFilters.push(pngFilter);
+      }
+      else if(currentLabel == "import_txt")
+      {
+        var txtFilter:FileFilter = new FileFilter("Text Files", "*.txt");
+        fileFilters.push(txtFilter);
+      }
+      
+      try
+      {
+        importFileReference.browse(fileFilters);
+      }
+      catch(e:Error)
+      {
+        generateOKDialog("There was an error opening the file window");
+      }
+    }
+    
+    public function referenceBrowse(e:Event):void 
+    {
+      //file was selected. check file type and size here
+      /*
+      if(currentLabel == "import_png" && importFileReference.type != ".png")
+      {
+        generateOKDialog("File must be of type .png");
+        return;
+      }
+      else if(currentLabel =="import_txt" && importFileReference.type != ".txt")
+      {
+        generateOKDialog("File must be of type .txt");
+        return;
+      }
+      */
+      //txtTest.text = "extension: " + importFileReference.type;
+      
+      if(importFileReference.size > importLimitBytes)
+      {
+        generateOKDialog("Filesize cannot exceed "+importLimitKB+"kb ("+importLimitBytes+" bytes)");
+        return;
+      }
+      
+      disableImportGo();
+      disableBack();
+      
+      //load it
+      try{
+        importFileReference.load();
+      }
+      catch(e:Error)
+      {
+        ioError(null);
+      }
+    }
+    
+    public function referenceLoaded(e:Event):void
+    {	
+      //get it with a loader
+      importLoader.unload();
+      try{
+        importLoader.loadBytes(importFileReference.data);
+      }
+      catch(e:Error)
+      {
+        ioError(null);
+      }
+    }
+    
+    public function fileLoaded(e:Event):void
+    {
+      //cleanup any existing preview regardless, re-enable the back button
+      enableBack();
+      
+      //now fully loaded! check width and height first
+      if(importLoader.width != SKIN_WIDTH || importLoader.height != SKIN_HEIGHT)
+      {
+        generateOKDialog("PNG must be exactly "+SKIN_WIDTH+"x"+SKIN_HEIGHT);
+        return;
+      }
+      
+      //checks out, continue with import/display
+      try
+      {
+        var importBitmap:Bitmap = importLoader.content as Bitmap;
+        savedView = PreviewBox.VIEW_FRONT;
+        mcPreviewBox.loadBase(importBitmap.bitmapData);
+      }
+      catch(e:Error)
+      {
+        ioError(null);
+        return;
+      }
+      
+      //refresh view and let them proceed
+      mcPreviewBox.refreshView();
+      enableImportGo();
+    }
+    
+    public function press_btnBackFromImport(e:MouseEvent):void
+    {
+      if(currentLabel == "import_png") cleanupMenuImportPNG();
+      else if(currentLabel == "import_txt")
+      {
+        if(curSkin)
+        {
+          curSkin.cleanup();
+          curSkin = null;
+        }
+        cleanupMenuImportTXT();
+      }
+      gotoAndStop("main","menu");
+    }
+    
+    public function press_btnGoImport(e:MouseEvent):void
+    {
+      //see if we're importing a png or text file
+      if(currentLabel == "import_png")
+      {
+        //grab the bitmapdata from our loader
+        var importBitmap:Bitmap = importLoader.content as Bitmap;
+        curSkin = new Skin();
+        curSkin.baseBitmapData = importBitmap.bitmapData;
+        
+        //cleanup and leave
+        cleanupMenuImportPNG();
+        editorFirstInit = true;
+        gotoAndStop("edit_main","editor");
+      }
+      else if(currentLabel == "import_txt")
+      {
+        //cur skin is already set up, go into the editor
+        cleanupMenuImportTXT();
+        editorFirstInit = true;
+        gotoAndStop("edit_main","editor");
+      }
+      
+      sfxBtnClick.play();
+    }
+    
+    public function enableImportGo():void
+    {
+      btnGoImport.mouseEnabled = true;
+      btnGoImport.alpha = 1;
+    }
+    
+    public function enableBack():void
+    {
+      btnBackFromImport.mouseEnabled = true;
+      btnBackFromImport.alpha = 1;
+    }
+    
+    public function disableImportGo():void
+    {
+      btnGoImport.mouseEnabled = false;
+      btnGoImport.alpha = .2;
+    }
+    
+    public function disableBack():void
+    {
+      btnBackFromImport.mouseEnabled = false;
+      btnBackFromImport.alpha = .2;
+    }
+    
+    public function cleanupMenuImportPNG():void
+    {
+      mcPreviewBox.cleanup();
+      
+      importFileReference.removeEventListener(Event.SELECT, referenceBrowse);
+      importFileReference.removeEventListener(Event.COMPLETE, referenceLoaded);
+      importFileReference.removeEventListener(IOErrorEvent.IO_ERROR, ioError);
+      importLoader.contentLoaderInfo.removeEventListener(Event.COMPLETE, fileLoaded);
+      importFileReference = null;
+      importLoader = null;
+      
+      btnBrowse.removeEventListener(MouseEvent.CLICK, press_btnBrowse);
+      btnGoImport.removeEventListener(MouseEvent.CLICK, press_btnImportPNG);
+      btnBackFromImport.removeEventListener(MouseEvent.CLICK, press_btnBackFromImport);
+    }
+    
+    public function ioError(e:IOErrorEvent):void
+    {
+      generateOKDialog("There was an error opening the file");
+      enableBack();
+    }
+    
+/**************************************************************************************************************
+ *  IMPORT TXT MENU
+ * ***********************************************************************************************************/
+
+    public function initMenuImportTXT():void
+    {
+      btnGoImport.buttonMode = true;
+      btnGoImport.addEventListener(MouseEvent.CLICK, press_btnGoImport);
+      disableImportGo();
+      
+      btnBackFromImport.buttonMode = true;
+      btnBackFromImport.addEventListener(MouseEvent.CLICK, press_btnBackFromImport);
+      
+      btnBrowse.addEventListener(MouseEvent.CLICK, press_btnBrowse);
+      btnBrowse.buttonMode = true;
+      importFileReference = new FileReference();
+      importFileReference.addEventListener(Event.SELECT, referenceBrowse);
+      importFileReference.addEventListener(Event.COMPLETE, referenceLoadedTXT);
+      importFileReference.addEventListener(IOErrorEvent.IO_ERROR, ioError);
+    }
+    
+    public function referenceLoadedTXT(e:Event):void
+    {
+      try
+      {
+        importFileReference.data.uncompress();
+        curSkin = importFileReference.data.readObject();
+        mcPreviewBox.loadBase(curSkin.baseBitmapData);
+        mcPreviewBox.skin = curSkin;
+      }
+      catch(e:Error)
+      {
+        ioError(null);
+        return;
+      }
+      
+      mcPreviewBox.refreshView();
+      enableBack();
+      enableImportGo();
+    }
+    
+    public function cleanupMenuImportTXT():void
+    {
+      mcPreviewBox.cleanup();
+      
+      importFileReference.removeEventListener(Event.SELECT, referenceBrowse);
+      importFileReference.removeEventListener(Event.COMPLETE, referenceLoadedTXT);
+      importFileReference.removeEventListener(IOErrorEvent.IO_ERROR, ioError);
+      importFileReference = null;
+      
+      btnBrowse.removeEventListener(MouseEvent.CLICK, press_btnBrowse);
+      btnGoImport.removeEventListener(MouseEvent.CLICK, press_btnImportPNG);
+      btnBackFromImport.removeEventListener(MouseEvent.CLICK, press_btnBackFromImport);
+    }
+    
+/**************************************************************************************************************
+ *  BROWSE UPLOADS
+ * ***********************************************************************************************************/
+
+    public function initMenuBrowse():void
+    {
+      Utilities.mc2Btn(btnBackFromBrowse);
+      btnBackFromBrowse.addEventListener(MouseEvent.CLICK, press_btnBackFromBrowse);
+      Utilities.mc2Btn(btnSearch);
+      btnSearch.addEventListener(MouseEvent.CLICK, press_btnSearch);
+      Utilities.mc2Btn(btnClearSearch);
+      btnClearSearch.addEventListener(MouseEvent.CLICK, press_btnClearSearch);
+      btnClearSearch.visible = false;
+      
+      //create preview box and set to browse mode
+      loadPreviewBox(420, 63,1);
+      mcPreviewBox.initBrowseMode();
+      
+      //create the browser
+      /*
+      saveBrowser = new SaveBrowser();
+      saveBrowser.x = 21;
+      saveBrowser.y = 10;
+      saveBrowser.scaleX = saveBrowser.scaleY = .95;
+      saveBrowser.saveGroup = "skins";
+      addChild(saveBrowser);
+      saveBrowser.title = "User Created Skins";
+      //saveBrowser.sortField = SaveQuery.FILE_NAME;
+      saveBrowser.loadFiles();
+      */
+      
+      //create vote bar
+      /*
+      voteBar = new VoteBar();
+      voteBar.scaleX = voteBar.scaleY = .75;
+      voteBar.x = 442;
+      voteBar.y = 318;
+      voteBar.rating = "score";
+      addChildAt(voteBar, numChildren);
+      */
+      
+      setChildIndex(voteBar, numChildren - 1);
+      
+      //listen for file load, and for vote processed
+      API.addEventListener(APIEvent.FILE_LOADED, skinLoaded);
+      API.addEventListener(APIEvent.VOTE_COMPLETE, voteComplete);
+      
+      //did we come here with a preloaded skin?
+      if(preloadNGSaveFile)
+      {
+        mcPreviewBox.loadBase(BitmapData(preloadNGSaveFile.data));
+        mcPreviewBox.refreshView();
+        voteBar.saveFile = preloadNGSaveFile;
+        voteBar.start();
+        preloadNGSaveFile = null;
+      }
+    }
+    
+    public function skinLoaded(event:APIEvent) 
+    {
+      if(event.success) 
+      {
+        ngSaveFile = com.newgrounds.SaveFile(event.data);
+        mcPreviewBox.loadBase(BitmapData(ngSaveFile.data));
+        mcPreviewBox.refreshView();
+        
+        voteBar.saveFile = ngSaveFile;
+        voteBar.start();
+      }
+    }
+    
+    public function voteComplete(event:APIEvent) 
+    {
+      if(event.success) 
+      {
+        unlockMedal("Passing Judgement");
+      }
+      else
+      {
+        generateOKDialog("You have already voted on this skin today");
+      }
+    }
+    
+    public function press_btnBackFromBrowse(e:MouseEvent):void
+    {
+      cleanupMenuBrowse();
+      gotoAndStop("main","menu");
+    }
+    
+    public function press_btnSearch(e:MouseEvent):void
+    {
+      mcSearchDialog.show();
+    }
+    
+    public function press_btnClearSearch(e:MouseEvent):void
+    {
+      btnClearSearch.visible = false;
+      saveBrowser.title = "User Created Skins";
+      saveBrowser.sortField = SaveQuery.CREATED_ON;
+      saveBrowser.loadFiles();
+    }
+    
+    public function takeToEditor():void
+    {
+      //grab the bitmapdata that's in the preview box
+      curSkin = new Skin();
+      curSkin.baseBitmapData = mcPreviewBox.sourceBitmapData.clone();
+      editorFirstInit = true;
+      
+      cleanupMenuBrowse();
+      gotoAndStop("edit_main","editor");
+    }
+    
+    public function cleanupMenuBrowse():void
+    {
+      //com.newgrounds.SaveFile.currentFile = null;
+      ngSaveFile = null;
+      
+      mcPreviewBox.cleanup();
+      removeChild(mcPreviewBox);
+      API.removeEventListener(APIEvent.FILE_LOADED, skinLoaded);
+      API.removeEventListener(APIEvent.VOTE_COMPLETE, voteComplete);
+      btnBackFromBrowse.removeEventListener(MouseEvent.CLICK, press_btnBackFromBrowse);
+      btnSearch.removeEventListener(MouseEvent.CLICK, press_btnSearch);
+      btnClearSearch.removeEventListener(MouseEvent.CLICK, press_btnClearSearch);
+      removeChild(saveBrowser);
+      removeChild(voteBar);
+      saveBrowser = null;
+      voteBar = null;
+    }
+ 
+/**************************************************************************************************************
+ *  EDITOR
+ * ***********************************************************************************************************/
+
+    public function initEditor():void 
+    {	
+      if(editorFirstInit)
+      {
+        editorFirstInit = false;
+        
+        showAdvancedOptions = false;
+        curTool = TOOL_NONE;
+        savedView = PreviewBox.VIEW_FRONT;
+        layerSelection = null;
+        savedLayerScrollPosition = 0;
+        mcToolFollow = new ToolFollow();
+        mcToolFollow.mouseEnabled = mcToolFollow.mouseChildren = false;
+        mcToolFollow.visible = false;
+        mcToolFollow.cacheAsBitmap = true;
+        addChild(mcToolFollow);
+        
+        //test layers
+        for(i = 0; i < 1; i++)
+        {
+          //curSkin.addLayer(new PremadeLayer(pieces[0]));
+        }
+        
+        //get dummy skin ready
+        dummySkin = new Skin();
+        dummySkin.baseBitmapData = curSkin.baseBitmapData.clone();
+      }
+      
+      //first tutorial clip?
+      mcTut1.visible = Utilities.saveFile.firstTime;
+      if(mcTut1.visible)
+      {
+        btnAddLayer.filters = new Array(new GlowFilter(0xFFFFFFFF, 1, 12, 12, 3, 2));
+      }
+      
+      //second
+      checkForSecondTutorialClip();
+      
+      //link preview box
+      loadPreviewBox(413, 67, 1);
+      
+      //skin name
+      txtSkinName.text = curSkin.name;
+      txtSkinName.maxChars = MAX_LAYER_NAME_LENGTH;
+      txtSkinName.addEventListener(Event.CHANGE, changeSkinName);
+      
+      //buttons
+      btnBackFromEditor.buttonMode = true;
+      btnAddLayer.buttonMode = true;
+      btnCopyLayer.buttonMode = true;
+      btnExport.buttonMode = true;
+      btnCopyLayer.addEventListener(MouseEvent.CLICK, press_btnCopyLayer);
+      btnCopyLayer.addEventListener(MouseEvent.ROLL_OVER, genericMouseOver);
+      btnCopyLayer.addEventListener(MouseEvent.ROLL_OUT, genericMouseOut);
+      btnAddLayer.addEventListener(MouseEvent.CLICK, press_btnAddLayer);
+      btnAddLayer.addEventListener(MouseEvent.ROLL_OVER, genericMouseOver);
+      btnAddLayer.addEventListener(MouseEvent.ROLL_OUT, genericMouseOut);
+      btnBackFromEditor.addEventListener(MouseEvent.CLICK, press_btnBackFromEditor);
+      btnBackFromEditor.addEventListener(MouseEvent.ROLL_OVER, genericMouseOver);
+      btnBackFromEditor.addEventListener(MouseEvent.ROLL_OUT, genericMouseOut);
+      btnExport.addEventListener(MouseEvent.CLICK, press_btnExport);
+      btnExport.addEventListener(MouseEvent.ROLL_OVER, genericMouseOver);
+      btnExport.addEventListener(MouseEvent.ROLL_OUT, genericMouseOut);
+      
+      btnShowSelection.buttonMode = true;
+      btnDeleteSelection.buttonMode = true;
+      btnShowSelection.addEventListener(MouseEvent.ROLL_OVER, genericMouseOver);
+      btnDeleteSelection.addEventListener(MouseEvent.ROLL_OVER, genericMouseOver);
+      btnDeleteSelection.addEventListener(MouseEvent.ROLL_OUT, genericMouseOut);
+      btnShowSelection.addEventListener(MouseEvent.ROLL_OUT, genericMouseOut);
+      btnShowSelection.addEventListener(MouseEvent.CLICK, press_btnShowSelection);
+      btnDeleteSelection.addEventListener(MouseEvent.CLICK, press_btnDeleteSelection);
+      //btnHideSelection.buttonMode = true;
+      //btnHideSelection.addEventListener(MouseEvent.ROLL_OVER, rollOverHideSelection);
+      //btnHideSelection.addEventListener(MouseEvent.ROLL_OUT, rollOutHideSelection);
+      //btnHideSelection.addEventListener(MouseEvent.CLICK, press_btnHideSelection);
+      
+      lstLayers.horizontalScrollPolicy = ScrollPolicy.OFF;
+      lstLayers.tabEnabled = false;
+      lstLayers.mouseFocusEnabled = false;
+      layerBoxes = new Vector.<LayerBox>;
+      
+      //load layers (if there are any)
+      updateLayers();
+      
+      //cursor, group indicator
+      cursorMode = CURSOR_FREE;
+      mcGroupIndicator.mouseEnabled = mcGroupIndicator.mouseChildren = false;
+    }
+    
+    public function checkForSecondTutorialClip():void
+    {
+      //second tutorial? if one layer is present and the save file says first layer is still true, show the message
+      if(curSkin.layers.length == 1 && Utilities.saveFile.firstLayer) mcTut2.visible = true;
+      else mcTut2.visible = false;
+    }
+    
+    public function changeSkinName(e:Event):void
+    {
+      //just update the skin object's name
+      curSkin.name = txtSkinName.text.substr(0,MAX_LAYER_NAME_LENGTH);
+    }
+    
+    public function loadPreviewBox(inX:int, inY:int, inScale:Number=1):void
+    {
+      mcPreviewBox = new PreviewBox();
+      mcPreviewBox.x = inX;
+      mcPreviewBox.y = inY;
+      mcPreviewBox.scaleX = mcPreviewBox.scaleY = inScale;
+      
+      //do we have a curskin to load in? (skip if dummy)
+      if(curSkin)
+      {
+        mcPreviewBox.skin = curSkin;
+        mcPreviewBox.loadBase(curSkin.baseBitmapData);
+        mcPreviewBox.refreshView();
+      }
+      
+      if(currentLabel == "edit_custom_layer")addChildAt(mcPreviewBox,getChildIndex(mcPanel) + 1);
+      else addChildAt(mcPreviewBox,getChildIndex(mcDirtBG) + 1);
+    }
+    
+    public function unloadPreviewBox():void
+    {
+      if(mcPreviewBox)
+      {
+        mcPreviewBox.cleanup();
+        removeChild(mcPreviewBox);
+        mcPreviewBox = null;
+      }
+    }
+    
+    public function updateLayerCount():void
+    {
+      txtLayerCount.text = curSkin.layers.length + "/" + MAX_LAYERS;
+    }
+    
+    public function updateLayers():void
+    {
+      //cleanup existing stuff before re-populating
+      mcPreviewBox.clearSourceBitmaps();
+      
+      //if there is already a saved position, leave it alone. otherwise save the current
+      if(savedLayerScrollPosition == 0)savedLayerScrollPosition = lstLayers.verticalScrollPosition;
+      
+      for each(tempLayerBox in layerBoxes)
+      {
+        tempLayerBox.cleanup();
+        layerHolder.removeChild(tempLayerBox);
+      }
+      
+      layerHolder = new Sprite();
+      layerBoxes = new Vector.<LayerBox>;
+      lstLayers.source = null;
+      var newLayerScrollPosition:int = -1;
+      
+      //loop through the skin's layers and add layer boxes for them, also add to the source/preview
+      var boxY:Number = 1;
+      for (i = curSkin.layers.length-1; i >=0; i--)
+      {
+        tempLayer = curSkin.layers[i];
+        tempLayerBox = new LayerBox(tempLayer);
+        tempLayerBox.y = boxY;
+        
+        //if we found a new layer, save the scroll position
+        if(tempLayer.isNew)
+        {
+          tempLayer.isNew = false;
+          newLayerScrollPosition = boxY;
+        }
+        
+        //if the layer is faded, draw with low alpha (for group drag)
+        if(tempLayer.faded) tempLayerBox.alpha = .3;
+        
+        //update y position for next box, add current one 
+        boxY += (tempLayerBox.mcOutline.height-1);
+        layerHolder.addChild(tempLayerBox);
+        layerBoxes.push(tempLayerBox);
+      }
+      
+      //loop through again and pop up layer boxes with selected layers
+      for each(tempLayerBox in layerBoxes)
+      {
+        if(tempLayerBox.targetLayer.selected)
+        {
+          layerHolder.setChildIndex(tempLayerBox, layerHolder.numChildren - 1);
+        }
+      }
+      
+      //add a spacer to the bottom layer box if layerholder is shorter than the list itself. also make sure there is at LEAST ONE LAYER BOX
+      if(layerBoxes.length>0 && layerHolder.height+2 < lstLayers.height)
+      {
+        layerBoxes[layerBoxes.length-1].addBottomSpacer(lstLayers.height - (layerHolder.height+2))
+      }
+      
+      //add a small, empty 1px sprite so that the insert bar on the bottom layer wont get messed up
+      var spacer:Sprite = new Sprite();
+      spacer.graphics.drawRect(0,0, 20, 2);
+      spacer.mouseEnabled = spacer.visible = false;
+      spacer.y = boxY;
+      layerHolder.addChild(spacer);
+      
+      lstLayers.source = layerHolder;
+      lstLayers.refreshPane();
+      lstLayers.update();
+      
+      //if there was a new layer inserted, use its scroll position. otherwise stick with the saved one
+      if(newLayerScrollPosition > -1) lstLayers.verticalScrollPosition = newLayerScrollPosition;
+      else lstLayers.verticalScrollPosition = savedLayerScrollPosition;
+      
+      savedLayerScrollPosition = 0;
+      
+      //show how many layers total, update preview
+      updateLayerCount();
+      mcPreviewBox.refreshView();
+    }
+    
+    public static function showDescription(inDescription:String):void
+    {
+      rootRef.txtDescription.text = inDescription;
+    }
+    
+    public function deselectAllLayers():void
+    {
+      for each(tempLayer in curSkin.layers){tempLayer.selected = false;}
+    }
+    
+    public function selectAllLayers():void
+    {
+      if(curSkin.layers.length == 0) return;
+      for each(tempLayer in curSkin.layers){tempLayer.selected = true;}
+      layerSelection = new LayerSelection(curSkin.layers[0], curSkin.layers.length);
+    }
+    
+    public function dragLayerSelection():void
+    {
+      cursorMode = CURSOR_DRAG;
+      layerSelection.fadeAll();
+      updateLayers();
+      mcGroupIndicator.visible = true;
+      mcGroupIndicator.txtLayersNum.text = layerSelection.layers.length + " Layer(s)";
+    }
+    
+    public function stopDragLayerSelection():void
+    {
+      cursorMode = CURSOR_FREE;
+      layerSelection.unfadeAll();
+      updateLayers();
+      mcGroupIndicator.x = mcGroupIndicator.y = 0;
+      mcGroupIndicator.visible = false;
+      
+      //void all insert locations
+      for each(tempLayerBox in layerBoxes)
+      {
+        tempLayerBox.voidEligibleInsertion();
+      }
+    }
+    
+    public function rollOverShowSelection(e:MouseEvent):void{if(cursorMode==CURSOR_FREE)showDescription("Show selected layers");}
+    public function rollOverHideSelection(e:MouseEvent):void{if(cursorMode==CURSOR_FREE)showDescription("Hide selected layers");}
+    public function rollOverDeleteSelection(e:MouseEvent):void{if(cursorMode==CURSOR_FREE)showDescription("Delete selected layers");}
+    public function rollOutShowSelection(e:MouseEvent):void{showDescription("");}
+    public function rollOutHideSelection(e:MouseEvent):void{showDescription("");}
+    public function rollOutDeleteSelection(e:MouseEvent):void{showDescription("");}
+    
+    public function press_btnShowSelection(e:MouseEvent):void
+    {
+      if(layerSelection == null) return;
+      
+      //if at least one layer is invisible, make all visible
+      var atLeastOneHidden:Boolean = false;
+      for each(tempLayer in layerSelection.layers)
+      {
+        if(tempLayer.hidden)
+        {
+          atLeastOneHidden = true;
+          break;
+        }
+      }
+      
+      if(atLeastOneHidden)
+      {
+        for each(tempLayer in layerSelection.layers)
+        {
+          tempLayer.hidden = false;
+        }
+      }
+      else
+      {
+        for each(tempLayer in layerSelection.layers)
+        {
+          tempLayer.hidden = true;
+        }
+      }
+      
+      updateLayers();
+    }
+    
+    public function press_btnHideSelection(e:MouseEvent):void
+    {
+      if(layerSelection == null) return;
+      
+      //set all layers in the selection to hidden
+      for each(tempLayer in layerSelection.layers)
+      {
+        tempLayer.hidden = true;
+      }
+      updateLayers();
+    }
+    
+    public function press_btnDeleteSelection(e:MouseEvent):void
+    {
+      if(layerSelection == null) return;
+      
+      //pop up a special dialog
+      Main.newDialogBox = new DialogBox('Are you sure you want to delete '+layerSelection.layers.length+' layer(s)?');
+      Main.newDialogBox.createAsYesNo("DELLAYERGROUP");
+      Main.newDialogBox.display();
+    }
+    
+    public function press_btnBackFromEditor(e:MouseEvent):void
+    {
+      //show yes/no prompt
+      Main.newDialogBox = new DialogBox('Are you sure you want to return to the menu? Unsaved progress will be lost');
+      Main.newDialogBox.createAsYesNo("BACKTOMENU");
+      Main.newDialogBox.display();
+    }
+    
+    public function press_btnExport(e:MouseEvent):void
+    {
+      mcExportDialog.show();
+    }
+    
+    public function press_btnAddLayer(e:MouseEvent):void
+    {
+      //check and make sure they're not at the max yet
+      if(curSkin.layers.length == MAX_LAYERS)
+      {
+        generateOKDialog("You cannot exceed " + MAX_LAYERS + " layers");
+        return;
+      }
+      
+      if(Utilities.saveFile.firstTime)
+      {
+        Utilities.saveFile.firstTime = false;
+        Utilities.saveGame();
+        mcTut1.visible = false;
+        btnAddLayer.filters = null;
+      }
+      
+      //show the dialog
+      mcLayerDialog.show();
+    }
+    
+    public function press_btnCopyLayer(e:MouseEvent):void
+    {
+      //make sure that exactly one layer is selected, and that they're not at the max
+      if(!layerSelection)
+      {
+        //generateOKDialog("you must select a layer to copy");
+        return;
+      }
+      if(layerSelection.layers.length > 1)
+      {
+        generateOKDialog("only one layer can be copied at a time");
+        return;
+      }
+      if(curSkin.layers.length == MAX_LAYERS)
+      {
+        generateOKDialog("You cannot exceed " + MAX_LAYERS + " layers");
+        return;
+      }
+      
+      var copyName:String = new String("[copy]" + layerSelection.layers[0].name).substr(0, MAX_LAYER_NAME_LENGTH);
+      var layerToCopy:Layer = layerSelection.layers[0];
+      var newLayer:Layer = layerToCopy.copy();
+      newLayer.name = copyName;
+      deselectAllLayers();
+      curSkin.addLayer(newLayer);
+      layerSelection = new LayerSelection(newLayer,0);
+      updateLayers();
+    }
+    
+/**************************************************************************************************************
+ *  PREMADE LAYER EDITOR
+ * ***********************************************************************************************************/
+
+    public function initSharedLayerContent():void
+    {
+      btnBackToLayers.buttonMode = true;
+      btnBackToLayers.addEventListener(MouseEvent.CLICK, press_btnBackToLayers);
+      btnBackToLayers.addEventListener(MouseEvent.ROLL_OVER, genericMouseOver);
+      btnBackToLayers.addEventListener(MouseEvent.ROLL_OUT, genericMouseOut);
+      
+      txtLayerName.text = layerToEdit.name;
+      txtLayerName.maxChars = MAX_LAYER_NAME_LENGTH;
+      
+      //opacity slider
+      sldOpacity.value = layerToEdit.opacity;
+      sldOpacity.addEventListener(Event.CHANGE, opacityChange);
+      
+      //blur slider 
+      sldBlur.value = layerToEdit.blur;
+      sldBlur.addEventListener(SliderEvent.CHANGE, changeBlur);
+      
+      //blend mode
+      for(i = 0; i < availableBlendModes.length; i++)
+      {
+        var blend:String = availableBlendModes[i];
+        var capitalBlend:String = blend.charAt(0).toUpperCase() + blend.substr(1);
+        cmbBlendModes.addItem({label:capitalBlend,data:blend});
+        
+        //is this blend currently selected for this layer?
+        if(layerToEdit.blendMode == blend) cmbBlendModes.selectedIndex = i;
+      }
+      cmbBlendModes.addEventListener(Event.CHANGE, changeBlendMode);
+      cmbBlendModes.mouseFocusEnabled = false;
+      
+      updateSliderDisplays();
+    }
+    
+    public function changeBlendMode(e:Event):void
+    {
+      //set the layer to the new blend mode and re-draw
+      layerToEdit.blendMode = cmbBlendModes.selectedItem.data;
+      mcPreviewBox.refreshView();
+    }
+    
+    public function initLayerEditor():void
+    {
+      //shared
+      initSharedLayerContent();
+      
+      //preview box
+      loadPreviewBox(413, 67, 1);
+      mcPreviewBox.mcBGLabel.visible = false;
+      
+      //movement stuff, but only if the piece in this layer can move
+      if(getPiece(PremadeLayer(layerToEdit).targetPieceID).canMove)
+      {
+        chkInvertX.selected = layerToEdit.invertX;
+        chkInvertY.selected = layerToEdit.invertY;
+        chkInvertX.addEventListener(Event.CHANGE, changeEitherInversion);
+        chkInvertY.addEventListener(Event.CHANGE, changeEitherInversion);
+        
+        btnArrowUp.buttonMode = btnArrowDown.buttonMode = btnArrowLeft.buttonMode = btnArrowRight.buttonMode = true;
+        btnArrowUp.direction = UP;
+        btnArrowDown.direction = DOWN;
+        btnArrowLeft.direction = LEFT;
+        btnArrowRight.direction = RIGHT;
+        btnArrowUp.addEventListener(MouseEvent.CLICK, press_btnArrow);
+        btnArrowUp.addEventListener(MouseEvent.ROLL_OVER, genericMouseOver);
+        btnArrowUp.addEventListener(MouseEvent.ROLL_OUT, genericMouseOut);
+        btnArrowDown.addEventListener(MouseEvent.CLICK, press_btnArrow);
+        btnArrowDown.addEventListener(MouseEvent.ROLL_OVER, genericMouseOver);
+        btnArrowDown.addEventListener(MouseEvent.ROLL_OUT, genericMouseOut);
+        btnArrowLeft.addEventListener(MouseEvent.CLICK, press_btnArrow);
+        btnArrowLeft.addEventListener(MouseEvent.ROLL_OVER, genericMouseOver);
+        btnArrowLeft.addEventListener(MouseEvent.ROLL_OUT, genericMouseOut);
+        btnArrowRight.addEventListener(MouseEvent.CLICK, press_btnArrow);
+        btnArrowRight.addEventListener(MouseEvent.ROLL_OVER, genericMouseOver);
+        btnArrowRight.addEventListener(MouseEvent.ROLL_OUT, genericMouseOut);
+        
+        mcNotAvailable.visible = false;
+      }
+      else
+      {
+        chkInvertX.mouseEnabled = chkInvertY.mouseEnabled = false;
+        chkInvertX.alpha = chkInvertY.alpha = .2;
+        btnArrowDown.alpha = btnArrowUp.alpha = btnArrowLeft.alpha = btnArrowRight.alpha = .2;
+        mcMovementExtra.alpha = .2;
+      }
+      
+      //flatten checkboxes
+      chkFlattenColor.selected = layerToEdit.flattenColor;
+      chkFlattenColor.addEventListener(Event.CHANGE, changeFlattenColor);
+      
+      //color grabber
+      colorGrabber.setColor(layerToEdit.tintColor, false);
+      colorGrabber.addEventListener(Event.CHANGE, changeColor);
+      
+      //advanced options
+      btnAdvancedOptions.buttonMode = true;
+      btnAdvancedOptions.addEventListener(MouseEvent.CLICK, press_btnAdvancedOptions);
+      if(showAdvancedOptions) btnAdvancedOptions.gotoAndStop(2);
+      
+      sldColorIntensity.value = layerToEdit.colorIntensity;
+      sldTextureIntensity.value = layerToEdit.textureIntensity;
+      sldColorIntensity.addEventListener(SliderEvent.CHANGE, changeColorIntensity);
+      sldTextureIntensity.addEventListener(SliderEvent.CHANGE, changeTextureIntensity);
+    }
+    
+    public function press_btnAdvancedOptions(e:MouseEvent):void
+    {
+      if(showAdvancedOptions)
+      {
+        showAdvancedOptions = false;
+        btnAdvancedOptions.gotoAndStop(1);
+      }
+      else
+      {
+        showAdvancedOptions = true;
+        btnAdvancedOptions.gotoAndStop(2);
+      }
+    }
+    
+    public function changeColor(e:Event):void
+    {
+      layerToEdit.tintColor = colorGrabber.actualColor;
+      mcPreviewBox.refreshView();
+    }
+    
+    public function changeEitherInversion(e:Event):void
+    {
+      layerToEdit.invertX = chkInvertX.selected;
+      layerToEdit.invertY = chkInvertY.selected;
+      mcPreviewBox.refreshView();
+    }
+    
+    public function changeFlattenColor(e:Event):void
+    {
+      layerToEdit.flattenColor = chkFlattenColor.selected;
+      mcPreviewBox.refreshView();
+    }
+    
+    public function updateSliderDisplays():void
+    {
+      if(txtOpacityValue) txtOpacityValue.text = layerToEdit.opacity.toString();
+      if(txtColorIntensity) txtColorIntensity.text = layerToEdit.colorIntensity.toString();
+      if(txtTextureIntensity) txtTextureIntensity.text = layerToEdit.textureIntensity.toString();
+      if(txtBlurValue) txtBlurValue.text = layerToEdit.blur.toString();
+    }
+    
+    public function press_btnArrow(e:MouseEvent):void
+    {
+      //re-cast our layer as a premade one so we can access the attempt move function
+      PremadeLayer(layerToEdit).attemptToMove(e.target.direction);
+    }
+    
+    public function press_btnBackToLayers(e:MouseEvent):void
+    {
+      //make sure they specified a layer name
+      if(txtLayerName.text == "")
+      {
+        generateOKDialog("Layer names must be at least one character long");
+        return;
+      }
+      layerToEdit.name = txtLayerName.text.substr(0,MAX_LAYER_NAME_LENGTH);
+      
+      //special clean up if in the pixel editor
+      if(currentLabel == "edit_custom_layer")
+      {
+        pixelEditor.cleanup();
+        removeChild(pixelEditor);
+        pixelEditor = null;
+        mcToolFollow.visible = false;
+      }
+      
+      //go back to layer list
+      unloadPreviewBox();
+      gotoAndStop("edit_main");
+    }
+    
+    public function opacityChange(e:Event):void
+    {
+      //update the layer object with new opacity, redraw the character
+      layerToEdit.opacity = uint(sldOpacity.value);
+      updateSliderDisplays();
+      mcPreviewBox.refreshView();
+    }
+    
+    public function changeColorIntensity(e:Event):void
+    {
+      //update the layer object with new value, redraw the character
+      layerToEdit.colorIntensity = uint(sldColorIntensity.value);
+      updateSliderDisplays();
+      mcPreviewBox.refreshView();
+    }
+    
+    public function changeTextureIntensity(e:Event):void
+    {
+      //update the layer object with new value, redraw the character
+      layerToEdit.textureIntensity = uint(sldTextureIntensity.value);
+      updateSliderDisplays();
+      mcPreviewBox.refreshView();
+    }
+    
+    public function changeBlur(e:Event):void
+    {
+      //update the layer object with new value, redraw the character
+      layerToEdit.blur = uint(sldBlur.value);
+      updateSliderDisplays();
+      mcPreviewBox.refreshView();
+    }
+    
+/**************************************************************************************************************
+ *  CUSTOM LAYER EDITOR
+ * ***********************************************************************************************************/
+
+    public function initCustomLayerEditor():void
+    {
+      //shared
+      initSharedLayerContent();
+      
+      //set up pixel editor stuff
+      var targetView:uint = CustomLayer(layerToEdit).targetView;
+      pixelEditor = new PixelEditor(10,65);
+      addChild(pixelEditor);
+      pixelEditor.drawView(targetView);
+      
+      //preview box positioning
+      if(targetView == PixelEditor.VIEW_ARM || targetView == PixelEditor.VIEW_LEG)
+      {
+        loadPreviewBox(400, 105, .7);
+      }
+      else if(targetView == PixelEditor.VIEW_BODY)
+      {
+        loadPreviewBox(450, 105, .7);
+      }
+      else
+      {
+        loadPreviewBox(535, 115, .6);
+      }
+      
+      //if on a dedicated hat layer, hide blur and opacity tools. show special messages
+      txtSpecialMessage.text = "";
+      if(targetView == PixelEditor.VIEW_HAT)
+      {
+        sldBlur.mouseEnabled = sldBlur.visible = false;
+        sldOpacity.mouseEnabled = sldOpacity.visible = false;
+        txtBlurValue.text = txtOpacityValue.text = "";
+        mcLabelBlur.visible = mcLabelOpacity.visible = false;
+        
+        txtSpecialMessage.text = "*Content in Hat Layers will always appear above other layers";
+      }
+      else if(targetView == PixelEditor.VIEW_ALL)
+      {
+        //if on the all layer, show a warning about hat pixels
+        txtSpecialMessage.text = "*Minecraft does not support transparent pixels in Hat surfaces";
+      }
+      
+      //hide shift+draw message
+      mcShiftMessage.visible = false;
+      
+      //show base checkbox
+      chkShowBase.selected = true;
+      chkShowBase.addEventListener(Event.CHANGE, changeChkShowBase);
+      chkShowBase.mouseFocusEnabled = false;
+      
+      //tools
+      btnPencil.toolID = TOOL_PENCIL;
+      btnEraser.toolID = TOOL_ERASER;
+      btnBucket.toolID = TOOL_BUCKET;
+      btnBucket.buttonMode = btnPencil.buttonMode = btnEraser.buttonMode = true;
+      btnUndo.buttonMode = true;
+      btnUndo.mouseChildren = false;
+      btnPencil.mcHighlight.visible = btnEraser.mcHighlight.visible = btnBucket.mcHighlight.visible = false;
+      btnPencil.mouseChildren = btnEraser.mouseChildren = btnBucket.mouseChildren = false;
+      btnPencil.addEventListener(MouseEvent.CLICK, press_btnTool);
+      btnEraser.addEventListener(MouseEvent.CLICK, press_btnTool);
+      btnBucket.addEventListener(MouseEvent.CLICK, press_btnTool);
+      btnUndo.addEventListener(MouseEvent.CLICK, press_btnUndo);
+      mcToolFollow.visible = false;
+      setChildIndex(mcToolFollow, numChildren - 1);
+      curTool = TOOL_NONE;
+      
+      updateUndoButton();
+      
+      //change view cmb
+      for(i = 0; i < PixelEditor.viewNames.length; i++)
+      {
+        cmbEditorView.addItem({label:PixelEditor.viewNames[i],data:i});
+      }
+      cmbEditorView.addEventListener(Event.CHANGE, changeEditorView);
+      cmbEditorView.mouseFocusEnabled = false;
+      
+      //surface name
+      txtSurfaceName.text = "";
+      
+      //always start with pencil
+      changeTool(TOOL_PENCIL);
+      btnPencil.mcHighlight.visible = true;
+    }
+    
+    public function updateUndoButton():void
+    {
+      //if there are no undo levels in the editor, set button to inactive/transparent
+      if(pixelEditor.undoLog.length > 0)
+      {
+        btnUndo.mouseEnabled = true;
+        btnUndo.alpha = 1;
+      }
+      else
+      {
+        btnUndo.mouseEnabled = false;
+        btnUndo.alpha = .3;
+      }
+    }
+    
+    public function press_btnUndo(e:MouseEvent):void
+    {
+      pixelEditor.undo();
+    }
+    
+    public function changeEditorView(e:Event):void
+    {
+      //disabled now
+      //pixelEditor.drawView(cmbEditorView.selectedIndex);
+    }
+    
+    public function changeChkShowBase(e:Event):void
+    {
+      stage.focus = null;
+      if(chkShowBase.selected) pixelEditor.showBase();
+      else pixelEditor.hideBase();
+    }
+    
+    public function dehighlightTools():void
+    {
+      btnPencil.mcHighlight.visible = btnEraser.mcHighlight.visible = btnBucket.mcHighlight.visible=false;
+    }
+    
+    public function changeTool(newTool:uint):void
+    {
+      curTool = newTool;
+      mcToolFollow.gotoAndStop(curTool);
+      setChildIndex(mcToolFollow, numChildren - 1);
+    }
+    
+    public function press_btnTool(e:MouseEvent):void
+    {
+      dehighlightTools();
+      changeTool(uint(e.currentTarget.toolID));
+      e.currentTarget.mcHighlight.visible = true;
+    }
+    
+    public function cleanupEditor():void
+    {
+      unloadPreviewBox();
+      mcLayerDialog.cleanup();
+      mcExportDialog.cleanup();
+      removeChild(mcToolFollow);
+      mcToolFollow = null;
+      curSkin.cleanup();
+      dummySkin.cleanup();
+      curSkin = dummySkin = null;
+      btnAddLayer.removeEventListener(MouseEvent.CLICK, press_btnAddLayer);
+      btnAddLayer.removeEventListener(MouseEvent.ROLL_OVER, genericMouseOver);
+      btnAddLayer.removeEventListener(MouseEvent.ROLL_OUT, genericMouseOut);
+      btnCopyLayer.removeEventListener(MouseEvent.CLICK, press_btnCopyLayer);
+      btnCopyLayer.removeEventListener(MouseEvent.ROLL_OVER, genericMouseOver);
+      btnCopyLayer.removeEventListener(MouseEvent.ROLL_OUT, genericMouseOut);
+      btnBackFromEditor.removeEventListener(MouseEvent.CLICK, press_btnBackFromEditor);
+      btnBackFromEditor.removeEventListener(MouseEvent.ROLL_OVER, genericMouseOver);
+      btnBackFromEditor.removeEventListener(MouseEvent.ROLL_OUT, genericMouseOut);
+      btnExport.removeEventListener(MouseEvent.CLICK, press_btnExport);
+      btnExport.removeEventListener(MouseEvent.ROLL_OVER, genericMouseOver);
+      btnExport.removeEventListener(MouseEvent.ROLL_OUT, genericMouseOut);
+      
+      txtSkinName.removeEventListener(Event.CHANGE, changeSkinName);
+      
+      btnShowSelection.removeEventListener(MouseEvent.ROLL_OVER, genericMouseOver);
+      btnDeleteSelection.removeEventListener(MouseEvent.ROLL_OVER, genericMouseOver);
+      btnDeleteSelection.removeEventListener(MouseEvent.ROLL_OUT, genericMouseOut);
+      btnShowSelection.removeEventListener(MouseEvent.ROLL_OUT, genericMouseOut);
+      btnShowSelection.removeEventListener(MouseEvent.CLICK, press_btnShowSelection);
+      btnDeleteSelection.removeEventListener(MouseEvent.CLICK, press_btnDeleteSelection);
+      //btnHideSelection.removeEventListener(MouseEvent.ROLL_OVER, rollOverHideSelection);
+      //btnHideSelection.removeEventListener(MouseEvent.ROLL_OUT, rollOutHideSelection);
+      //btnHideSelection.removeEventListener(MouseEvent.CLICK, press_btnHideSelection);
+    }
+    
+    public static function generateOKDialog(inMessage:String, showProfileLink:Boolean = false, showNGLink:Boolean=false):void
+    {
+      newDialogBox = new DialogBox(inMessage);
+      newDialogBox.createAsOk("", showProfileLink, showNGLink);
+      newDialogBox.display();
+    }
+    
+    public function unlockMedal(medalName:String):void
+    {
+      return;
+      //find the medal object
+      var medal:Medal;
+      for each(var tempMedal:Medal in API.medals)
+      {
+        if(tempMedal.name == medalName)
+        {
+          medal = tempMedal;
+          break;
+        }
+      }
+      
+      //check for unlock
+      if(medal && !medal.unlocked)
+      {
+        setChildIndex(medalPopup, numChildren - 1);
+        API.unlockMedal(medalName);
+      }
+    }
+  }
 }

@@ -1,482 +1,446 @@
-package
-{
-   import flash.display.Bitmap;
-   import flash.display.BitmapData;
-   import flash.display.Sprite;
-   import flash.events.MouseEvent;
-   import flash.geom.Point;
-   import flash.geom.Rectangle;
-   import flash.utils.ByteArray;
-   
-   public class PixelEditor extends Sprite
-   {
+﻿package
+{	
+  import com.adobe.protocols.dict.events.ConnectedEvent;
+  import fl.motion.Color;
+  import flash.display.Bitmap;
+  import flash.display.Sprite;
+  import flash.events.MouseEvent;
+  import flash.geom.Point;
+  import flash.geom.Rectangle;
+  import flash.utils.ByteArray;
+  import flash.display.BitmapData;
+  import flash.display.BlendMode;
+  
+  public class PixelEditor extends Sprite
+  {
+    //instance vars
+    public var pixelContainer:Sprite;
+    public var gridContainer:Sprite;
+    public var tempPixel:Pixel;
+    public var pixels:Vector.<Vector.<Pixel>>;
+    public var fillColor:uint; //what we use when painting
+    public var fillAlpha:Number; //alpha to use when painting
+    public var curView:uint; //which view we are targeting
+    public var curViewRect:Rectangle;
+    public var viewRects:Array; //rectangles that define each view area
+    public var tempSurface:Surface;
+    public var baseBitmap:Bitmap;
+    public var baseBitmapData:BitmapData;
+    public var includedSurfaces:Vector.<Surface>;
+    public var lockHorizontal:Boolean;
+    public var lockVertical:Boolean;
+    public var lockX:Number;
+    public var lockY:Number;
+    public var floodColor:uint;
+    public var floodSurface:int;
+    public var floodAlpha:uint;
+    public var undoLog:Vector.<BitmapData>;
+    private var i:uint, j:uint;
+    
+    //frame-independent check
+    public var prevMouseX:Number;
+    public var prevMouseY:Number;
+    public var incX:Number;
+    public var incY:Number;
+    public var distanceTraveled:Number;
+    
+    public static var viewNames:Array = new Array("All","Head","Body","Leg","Arm","Hat");
+    public static var PIXEL_SCALE:uint;
+    
+    public static const VIEW_ALL:uint = 0;
+    public static const VIEW_HEAD:uint = 1;
+    public static const VIEW_BODY:uint = 2;
+    public static const VIEW_LEG:uint = 3;
+    public static const VIEW_ARM:uint = 4;
+    public static const VIEW_HAT:uint = 5;
+    
+    public function PixelEditor(inX:int, inY:int):void
+    {
+      //init
+      x = inX;
+      y = inY;
+      prevMouseX = prevMouseY = 0;
       
-      public static const VIEW_HEAD:uint = 1;
+      //define view rectangles
+      viewRects = new Array();
+      viewRects[VIEW_ALL] = new Rectangle(0,0,Main.SKIN_WIDTH, Main.SKIN_HEIGHT);
+      viewRects[VIEW_HEAD] = new Rectangle(0,0,32,16);
+      viewRects[VIEW_BODY] = new Rectangle(16,16,24,16);
+      viewRects[VIEW_LEG] = new Rectangle(0,16,16,16);
+      viewRects[VIEW_ARM] = new Rectangle(40,16,16,16);
+      viewRects[VIEW_HAT] = new Rectangle(32,0,32,16);
       
-      public static const VIEW_LEG_RIGHT_JACKET:uint = 11;
+      //mouse listeners
+      addEventListener(MouseEvent.MOUSE_DOWN, mouseDown);
+      addEventListener(MouseEvent.ROLL_OUT, mouseOut);
+      Main.stageRef.addEventListener(MouseEvent.MOUSE_MOVE, mouseMove);
       
-      public static const VIEW_ARM_LEFT:uint = 6;
+      //drawView(VIEW_ALL);
       
-      public static const VIEW_LEG_RIGHT:uint = 3;
-      
-      public static const VIEW_LEG_LEFT:uint = 7;
-      
-      public static var PIXEL_SCALE:uint;
-      
-      public static const VIEW_LEG_LEFT_JACKET:uint = 12;
-      
-      public static const VIEW_ARM_RIGHT:uint = 4;
-      
-      public static const VIEW_HAT:uint = 5;
-      
-      public static var viewNames:Array = new Array("All","Head","Body","Right Leg","Right Arm","Head (hat)","Left Arm","Left Leg","Body (jacket)","Right Arm (jacket)","Left Arm (jacket)","Right Leg (jacket)","Left leg (jacket)");
-      
-      public static const VIEW_ALL:uint = 0;
-      
-      public static const VIEW_ARM_RIGHT_JACKET:uint = 9;
-      
-      public static const VIEW_ARM_LEFT_JACKET:uint = 10;
-      
-      public static const VIEW_BODY_JACKET:uint = 8;
-      
-      public static const VIEW_BODY:uint = 2;
-       
-      
-      public var curView:uint;
-      
-      public var floodAlpha:uint;
-      
-      public var curViewRect:Rectangle;
-      
-      public var floodColor:uint;
-      
-      public var lockX:Number;
-      
-      public var lockY:Number;
-      
-      public var tempPixel:Pixel;
-      
-      public var pixelContainer:Sprite;
-      
-      public var fillColor:uint;
-      
-      public var fillAlpha:Number;
-      
-      public var baseBitmapData:BitmapData;
-      
-      public var pixels:Vector.<Vector.<Pixel>>;
-      
-      public var lockHorizontal:Boolean;
-      
-      public var tempSurface:Surface;
-      
-      public var incX:Number;
-      
-      public var incY:Number;
-      
-      public var lockVertical:Boolean;
-      
-      public var includedSurfaces:Vector.<Surface>;
-      
-      public var floodSurface:int;
-      
-      public var distanceTraveled:Number;
-      
-      public var undoLog:Vector.<BitmapData>;
-      
-      public var gridContainer:Sprite;
-      
-      public var baseBitmap:Bitmap;
-      
-      public var prevMouseY:Number;
-      
-      private var i:uint;
-      
-      private var j:uint;
-      
-      public var prevMouseX:Number;
-      
-      public var viewRects:Array;
-      
-      public var originY:Number;
-      
-      public function PixelEditor(param1:int, param2:int)
+      undoLog = new Vector.<BitmapData>;
+    }
+    
+    public function undo():void
+    {
+      //just in case there aren't any previous states
+      if(undoLog.length == 0)
       {
-         super();
-         x = param1;
-         y = this.originY = param2;
-         this.prevMouseX = this.prevMouseY = 0;
-         this.viewRects = new Array();
-         this.viewRects[VIEW_ALL] = new Rectangle(0,0,Main.SKIN_WIDTH,Main.SKIN_HEIGHT);
-         this.viewRects[VIEW_HEAD] = new Rectangle(0,0,32,16);
-         this.viewRects[VIEW_BODY] = new Rectangle(16,16,24,16);
-         this.viewRects[VIEW_LEG_RIGHT] = new Rectangle(0,16,16,16);
-         this.viewRects[VIEW_ARM_RIGHT] = new Rectangle(40,16,16,16);
-         this.viewRects[VIEW_HAT] = new Rectangle(32,0,32,16);
-         this.viewRects[VIEW_LEG_LEFT] = new Rectangle(16,48,16,16);
-         this.viewRects[VIEW_ARM_LEFT] = new Rectangle(32,48,16,16);
-         this.viewRects[VIEW_BODY_JACKET] = new Rectangle(16,32,24,16);
-         this.viewRects[VIEW_ARM_RIGHT_JACKET] = new Rectangle(40,32,16,16);
-         this.viewRects[VIEW_ARM_LEFT_JACKET] = new Rectangle(48,48,16,16);
-         this.viewRects[VIEW_LEG_RIGHT_JACKET] = new Rectangle(0,32,16,16);
-         this.viewRects[VIEW_LEG_LEFT_JACKET] = new Rectangle(0,48,16,16);
-         addEventListener(MouseEvent.MOUSE_DOWN,this.mouseDown);
-         addEventListener(MouseEvent.ROLL_OUT,this.mouseOut);
-         Main.stageRef.addEventListener(MouseEvent.MOUSE_MOVE,this.mouseMove);
-         this.undoLog = new Vector.<BitmapData>();
+        trace("no undo levels");
+        return;
       }
       
-      public function drawView(param1:uint) : void
+      //revert to the undo state at the end of the log, then erase it
+      CustomLayer(Main.layerToEdit).customBitmapData = undoLog[undoLog.length - 1].clone();
+      undoLog.pop();
+      
+      //update editor and model view
+      drawView(curView);
+      Main.rootRef.mcPreviewBox.refreshView();
+      
+      //play the button's animation
+      Main.rootRef.btnUndo.gotoAndPlay(2);
+      
+      //update the button
+      Main.rootRef.updateUndoButton();
+    }
+    
+    public function drawView(inView:uint):void
+    {
+      //clear any existing junk
+      clearView();
+      
+      //get cur view and rect
+      curView = inView;
+      curViewRect = viewRects[curView] as Rectangle;
+      
+      //augment pixel scale based on view
+      if(curView == VIEW_ALL) PIXEL_SCALE = 8;
+      else PIXEL_SCALE = 16;
+      
+      //add the base skin at the bottom
+      baseBitmapData = new BitmapData(curViewRect.width, curViewRect.height);
+      //baseBitmapData.copyPixels(Main.rootRef.mcPreviewBox.baseBitmapData, curViewRect, new Point(0,0));
+      baseBitmapData.copyPixels(new preset_1(64,32), curViewRect, new Point(0,0));
+      baseBitmap = new Bitmap(baseBitmapData);
+      baseBitmap.alpha = .2;
+      baseBitmap.scaleX = baseBitmap.scaleY = PIXEL_SCALE;
+      addChild(baseBitmap);
+      
+      pixelContainer = new Sprite();
+      gridContainer = new Sprite();
+      gridContainer.mouseEnabled = gridContainer.mouseChildren = false;
+      gridContainer.graphics.lineStyle(.5, 0x000000, .4);
+      gridContainer.mouseEnabled = false;
+      var gridHeight:uint = curViewRect.height * PIXEL_SCALE;
+      var gridWidth:uint = curViewRect.width * PIXEL_SCALE;
+      
+      pixels = new Vector.<Vector.<Pixel>>;
+      var rowPixels:Vector.<Pixel>;
+      var curColor:uint;
+      
+      //read the byte array of pixels from the layer's bitmap data
+      var pixelByteArray:ByteArray = Main.layerToEdit.getBitmapData().getPixels(curViewRect);
+      pixelByteArray.position = 0;
+      
+      for(i = 0; i <=curViewRect.height; i++)
       {
-         var _loc4_:Vector.<Pixel> = null;
-         var _loc5_:uint = 0;
-         var _loc7_:Rectangle = null;
-         var _loc8_:uint = 0;
-         var _loc9_:uint = 0;
-         var _loc10_:uint = 0;
-         var _loc11_:uint = 0;
-         this.clearView();
-         this.curView = param1;
-         this.curViewRect = this.viewRects[this.curView] as Rectangle;
-         if(this.curView == VIEW_ALL)
-         {
-            PIXEL_SCALE = 8;
-         }
-         else
-         {
-            PIXEL_SCALE = 16;
-         }
-         this.baseBitmapData = new BitmapData(this.curViewRect.width,this.curViewRect.height);
-         this.baseBitmapData.copyPixels(new preset_1(64,32),this.curViewRect,new Point(0,0));
-         this.baseBitmap = new Bitmap(this.baseBitmapData);
-         this.baseBitmap.alpha = 0.2;
-         this.baseBitmap.scaleX = this.baseBitmap.scaleY = PIXEL_SCALE;
-         addChild(this.baseBitmap);
-         this.pixelContainer = new Sprite();
-         this.gridContainer = new Sprite();
-         this.gridContainer.mouseEnabled = this.gridContainer.mouseChildren = false;
-         this.gridContainer.graphics.lineStyle(0.5,0,0.4);
-         this.gridContainer.mouseEnabled = false;
-         var _loc2_:uint = this.curViewRect.height * PIXEL_SCALE;
-         var _loc3_:uint = this.curViewRect.width * PIXEL_SCALE;
-         this.pixels = new Vector.<Vector.<Pixel>>();
-         var _loc6_:ByteArray;
-         (_loc6_ = Main.layerToEdit.getBitmapData().getPixels(this.curViewRect)).position = 0;
-         this.i = 0;
-         while(this.i <= this.curViewRect.height)
-         {
-            _loc4_ = new Vector.<Pixel>();
-            this.gridContainer.graphics.moveTo(0,this.i * PIXEL_SCALE);
-            this.gridContainer.graphics.lineTo(_loc3_,this.i * PIXEL_SCALE);
-            if(this.i != this.curViewRect.height)
+        rowPixels = new Vector.<Pixel>;
+        gridContainer.graphics.moveTo(0, i*PIXEL_SCALE);
+        gridContainer.graphics.lineTo(gridWidth, i*PIXEL_SCALE);
+        
+        //we go one iteration extra to draw the full grid, so break out here before adding more pixels
+        if(i == curViewRect.height) continue;
+        
+        for(j = 0; j <=curViewRect.width; j++)
+        {
+          gridContainer.graphics.moveTo(j * PIXEL_SCALE, 0);
+          gridContainer.graphics.lineTo(j * PIXEL_SCALE, gridHeight);
+          
+          //we go one iteration extra to draw the full grid, so break out here before adding more pixels
+          if(j == curViewRect.width) continue;
+          
+          tempPixel = new Pixel(j,i);
+          curColor = pixelByteArray.readUnsignedInt();
+          tempPixel.setColor(curColor, curColor == 0?0:1);
+          
+          tempPixel.x = j * PIXEL_SCALE;
+          tempPixel.y = i * PIXEL_SCALE;
+          
+          rowPixels.push(tempPixel);
+          pixelContainer.addChild(tempPixel);
+        }
+        pixels.push(rowPixels);
+      }
+      
+      //find the surfaces contained within the current view rect and draw them on the grid
+      gridContainer.graphics.lineStyle(2,0x000000,1);
+      var surfaceRect:Rectangle;
+      var drawX:uint, drawY:uint;
+      var drawWidth:uint, drawHeight:uint;
+      includedSurfaces = new Vector.<Surface>;
+      for each(tempSurface in Main.surfaces)
+      {
+        surfaceRect = tempSurface.sourceRect;
+        if(curViewRect.containsRect(surfaceRect))
+        {
+          //paint and save it
+          drawX = (surfaceRect.x - curViewRect.x);
+          drawY = (surfaceRect.y - curViewRect.y);
+          drawWidth = surfaceRect.width;
+          drawHeight = surfaceRect.height;
+          gridContainer.graphics.drawRect(drawX*PIXEL_SCALE, drawY*PIXEL_SCALE, drawWidth*PIXEL_SCALE, drawHeight*PIXEL_SCALE);
+          includedSurfaces.push(tempSurface);
+          
+          for(i = drawY; i < (drawY + drawHeight); i++)
+          {
+            for(j = drawX; j <(drawX + drawWidth); j++)
             {
-               this.j = 0;
-               while(this.j <= this.curViewRect.width)
-               {
-                  this.gridContainer.graphics.moveTo(this.j * PIXEL_SCALE,0);
-                  this.gridContainer.graphics.lineTo(this.j * PIXEL_SCALE,_loc2_);
-                  if(this.j != this.curViewRect.width)
-                  {
-                     this.tempPixel = new Pixel(this.j,this.i);
-                     _loc5_ = _loc6_.readUnsignedInt();
-                     this.tempPixel.setColor(_loc5_,_loc5_ == 0 ? uint(0) : uint(1));
-                     this.tempPixel.x = this.j * PIXEL_SCALE;
-                     this.tempPixel.y = this.i * PIXEL_SCALE;
-                     _loc4_.push(this.tempPixel);
-                     this.pixelContainer.addChild(this.tempPixel);
-                  }
-                  ++this.j;
-               }
-               this.pixels.push(_loc4_);
+              pixels[i][j].surfaceID = tempSurface.id;
+              //trace("pixel at " +j + "," + i + "assigned to surface " + tempSurface.name);
             }
-            ++this.i;
-         }
-         this.gridContainer.graphics.lineStyle(2,0,1);
-         this.includedSurfaces = new Vector.<Surface>();
-         for each(this.tempSurface in Main.surfaces)
-         {
-            _loc7_ = this.tempSurface.sourceRect;
-            if(this.curViewRect.containsRect(_loc7_))
+          }
+        }
+      }
+      
+      //gridContainer.blendMode = BlendMode.INVERT;
+      gridContainer.cacheAsBitmap = true;
+      pixelContainer.cacheAsBitmap = true;
+      addChild(pixelContainer);
+      addChild(gridContainer);
+    }
+    
+    public function clearView():void
+    {
+      if(gridContainer)
+      {
+        gridContainer.graphics.clear();
+        removeChild(gridContainer);
+      }
+      if(pixelContainer)
+      {
+        removeChild(pixelContainer);
+      }
+      if(baseBitmap)
+      {
+        baseBitmap.bitmapData.dispose();
+        removeChild(baseBitmap);
+      }
+    }
+    
+    public function mouseDown(e:MouseEvent):void
+    {
+      //get target pixel
+      var targetPixel:Pixel = getPixelAtPoint(mouseX, mouseY);
+      setPixelsEligibleForColor();
+      
+      Main.stageRef.focus = null;
+      
+      //do they have a tool selected?
+      if(Main.curTool == Main.TOOL_ERASER)
+      {
+        captureUndoLevel();
+        Main.cursorMode = Main.CURSOR_DRAW;
+        fillAlpha = 0;
+        fillColor = 0;
+        targetPixel.setColor(fillColor,fillAlpha);
+        transferEditorToLayer();
+        Main.rootRef.mcShiftMessage.visible = true;
+      }
+      else if(Main.curTool == Main.TOOL_PENCIL)
+      {
+        captureUndoLevel();
+        Main.cursorMode = Main.CURSOR_DRAW;
+        fillAlpha = 1;
+        fillColor = Main.rootRef.colorGrabber.actualColor;
+        targetPixel.setColor(fillColor,fillAlpha);
+        transferEditorToLayer();
+        Main.rootRef.mcShiftMessage.visible = true;
+      }
+      else if(Main.curTool == Main.TOOL_BUCKET)
+      {
+        captureUndoLevel();
+        
+        //constrain the ensuing fill to the surface/color/alpha of this pixel, then start the flood fill
+        floodSurface = targetPixel.surfaceID;
+        floodColor = targetPixel.color;
+        floodAlpha = targetPixel.colorAlpha;
+        
+        fillAlpha = 1;
+        fillColor = Main.rootRef.colorGrabber.actualColor;
+        floodFill(targetPixel);
+        transferEditorToLayer();
+      }
+    }
+    
+    public function captureUndoLevel():void
+    {
+      undoLog.push(Main.layerToEdit.getBitmapData());
+      
+      //too many?
+      if(undoLog.length > 20) undoLog.shift();
+      
+      //the button will be usable now
+      Main.rootRef.updateUndoButton();
+    }
+    
+    public function floodFill(inPixel:Pixel):void
+    {
+      //if this pixel matches the requirements, fill and move on to its neighbors
+      if(inPixel.surfaceID == floodSurface && inPixel.color == floodColor && inPixel.colorAlpha == floodAlpha)
+      {
+        inPixel.setColor(fillColor, fillAlpha);
+        
+        //neighbors
+        propagateFloodFill(inPixel.gridX-1,inPixel.gridY);
+        propagateFloodFill(inPixel.gridX+1,inPixel.gridY);
+        propagateFloodFill(inPixel.gridX,inPixel.gridY-1);
+        propagateFloodFill(inPixel.gridX,inPixel.gridY+1);
+      }
+    }
+    
+    public function propagateFloodFill(pixelX:int, pixelY:int):void
+    {
+      //the pixel x/y being passed in are hypothetical neighbor locations to another pixel. make sure they are even valid
+      if( (pixelX >= 0 && pixelX < curViewRect.width) && (pixelY >=0 && pixelY < curViewRect.height) )
+      {
+        tempPixel = pixels[pixelY][pixelX];
+        if(tempPixel.eligibleForColor) floodFill(tempPixel);
+      }
+    }
+    
+    public function mouseOut(e:MouseEvent):void
+    {
+      Main.rootRef.txtSurfaceName.text = "";
+    }
+    
+    public function setPixelsEligibleForColor():void
+    {
+      for(i = 0; i < curViewRect.height; i++)
+      {
+        for(j = 0; j < curViewRect.width; j++)
+        {
+          pixels[i][j].eligibleForColor = true;
+        }
+      }
+    }
+    
+    public function getPixelAtPoint(inX:Number, inY:Number):Pixel
+    {
+      //first find the pixel that is being targetted
+      if(inX < 0) inX = 0;
+      if(inY < 0) inY = 0;
+      var pixelX:uint = inX / PIXEL_SCALE;
+      var pixelY:uint = inY / PIXEL_SCALE;
+      
+      if(pixelX >= curViewRect.width) pixelX = curViewRect.width - 1;
+      if(pixelY >= curViewRect.height) pixelY = curViewRect.height - 1;
+      
+      return pixels[pixelY][pixelX];
+    }
+    
+    public function mouseMove(e:MouseEvent):void
+    {
+      //if the spectrum chooser is active, or using the eyedropper tool, don't mess with this
+      if(Main.rootRef.colorGrabber.usingSpectrum || Main.curTool==Main.TOOL_EYEDROPPER) return;
+      
+      var thisRect:Rectangle = new Rectangle(0,0,width,height);
+      if(thisRect.contains(mouseX,mouseY))
+      {				
+        //always update with the current pixel's surface name
+        tempPixel = getPixelAtPoint(mouseX, mouseY);
+        if(tempPixel.surfaceID == -1) Main.rootRef.txtSurfaceName.text = "Unused";
+        else Main.rootRef.txtSurfaceName.text = Main.getSurface(tempPixel.surfaceID).name;
+        
+        //see if we're drawing
+        if(Main.cursorMode == Main.CURSOR_DRAW)
+        {
+          setPixelsEligibleForColor();
+          
+          //draw line between old and current mouse x/y, attempt to fill the pixels along the way
+          incX = mouseX - prevMouseX;
+          incY = mouseY - prevMouseY;
+          distanceTraveled = Math.sqrt( incX*incX + incY*incY );
+          incX /= distanceTraveled;
+          incY /= distanceTraveled;
+          
+          //lock a direction?
+          if(KeyManager.pressing(KeyManager.SHIFT))
+          {
+            if(!lockHorizontal && !lockVertical)
             {
-               _loc8_ = _loc7_.x - this.curViewRect.x;
-               _loc9_ = _loc7_.y - this.curViewRect.y;
-               _loc10_ = _loc7_.width;
-               _loc11_ = _loc7_.height;
-               this.gridContainer.graphics.drawRect(_loc8_ * PIXEL_SCALE,_loc9_ * PIXEL_SCALE,_loc10_ * PIXEL_SCALE,_loc11_ * PIXEL_SCALE);
-               this.includedSurfaces.push(this.tempSurface);
-               this.i = _loc9_;
-               while(this.i < _loc9_ + _loc11_)
-               {
-                  this.j = _loc8_;
-                  while(this.j < _loc8_ + _loc10_)
-                  {
-                     this.pixels[this.i][this.j].surfaceID = this.tempSurface.id;
-                     ++this.j;
-                  }
-                  ++this.i;
-               }
+              if(Math.abs(incX) > Math.abs(incY))
+              {
+                lockVertical = true;
+                lockY = prevMouseY;
+                //trace("lock vertical");
+              }
+              else
+              {
+                lockHorizontal = true;
+                lockX = prevMouseX;
+                //trace("lock horizontal");
+              }
             }
-         }
-         this.gridContainer.cacheAsBitmap = true;
-         this.pixelContainer.cacheAsBitmap = true;
-         addChild(this.pixelContainer);
-         addChild(this.gridContainer);
+          }
+          else
+          {
+            lockHorizontal = lockVertical = false;
+          }
+          
+          for(i = 0; i < distanceTraveled; i++)
+          {
+            getPixelAtPoint(lockHorizontal? lockX:prevMouseX, lockVertical?lockY:prevMouseY).setColor(fillColor, fillAlpha);
+            
+            prevMouseX += incX;
+            prevMouseY += incY;
+          }
+          
+          //transfer that shit
+          transferEditorToLayer();
+        }
+        else
+        {
+          //if we're not drawing, cancel any axis locks
+          lockVertical = lockHorizontal = false;
+        }
       }
       
-      public function mouseMove(param1:MouseEvent) : void
+      //update previous coords now
+      prevMouseX = mouseX;
+      prevMouseY = mouseY;
+    }
+    
+    public function transferEditorToLayer():void
+    {
+      //loop through and transfer each pixel color into a byte array
+      var pixelBytes:ByteArray = new ByteArray();
+      for(i = 0; i < curViewRect.height; i++)
       {
-         if(Main.rootRef.colorGrabber.usingSpectrum || Main.curTool == Main.TOOL_EYEDROPPER)
-         {
-            return;
-         }
-         if(Main.rootRef.pixelEditorMask.getRect(Main.rootRef).contains(Main.rootRef.mouseX,Main.rootRef.mouseY))
-         {
-            this.tempPixel = this.getPixelAtPoint(mouseX,mouseY);
-            if(this.tempPixel.surfaceID == -1)
-            {
-               Main.rootRef.txtSurfaceName.text = "Unused";
-            }
-            else
-            {
-               Main.rootRef.txtSurfaceName.text = Main.getSurface(this.tempPixel.surfaceID).name;
-            }
-            if(Main.cursorMode == Main.CURSOR_DRAW)
-            {
-               this.setPixelsEligibleForColor();
-               this.incX = mouseX - this.prevMouseX;
-               this.incY = mouseY - this.prevMouseY;
-               this.distanceTraveled = Math.sqrt(this.incX * this.incX + this.incY * this.incY);
-               this.incX /= this.distanceTraveled;
-               this.incY /= this.distanceTraveled;
-               if(KeyManager.pressing(KeyManager.SHIFT))
-               {
-                  if(!this.lockHorizontal && !this.lockVertical)
-                  {
-                     if(Math.abs(this.incX) > Math.abs(this.incY))
-                     {
-                        this.lockVertical = true;
-                        this.lockY = this.prevMouseY;
-                     }
-                     else
-                     {
-                        this.lockHorizontal = true;
-                        this.lockX = this.prevMouseX;
-                     }
-                  }
-               }
-               else
-               {
-                  this.lockHorizontal = this.lockVertical = false;
-               }
-               this.i = 0;
-               while(this.i < this.distanceTraveled)
-               {
-                  this.getPixelAtPoint(!!this.lockHorizontal ? Number(this.lockX) : Number(this.prevMouseX),!!this.lockVertical ? Number(this.lockY) : Number(this.prevMouseY)).setColor(this.fillColor,this.fillAlpha);
-                  this.prevMouseX += this.incX;
-                  this.prevMouseY += this.incY;
-                  ++this.i;
-               }
-               this.transferEditorToLayer();
-            }
-            else
-            {
-               this.lockVertical = this.lockHorizontal = false;
-            }
-         }
-         this.prevMouseX = mouseX;
-         this.prevMouseY = mouseY;
+        for(j = 0; j < curViewRect.width; j++)
+        {
+          tempPixel = pixels[i][j];
+          if(tempPixel.colorAlpha == 0) pixelBytes.writeUnsignedInt(0);
+          else 
+          {
+            pixelBytes.writeUnsignedInt((0xFF000000 | tempPixel.color));
+            //pixelBytes.writeUnsignedInt((tempPixel.color));
+          }
+        }
       }
       
-      public function clearView() : void
-      {
-         if(this.gridContainer)
-         {
-            this.gridContainer.graphics.clear();
-            removeChild(this.gridContainer);
-         }
-         if(this.pixelContainer)
-         {
-            removeChild(this.pixelContainer);
-         }
-         if(this.baseBitmap)
-         {
-            this.baseBitmap.bitmapData.dispose();
-            removeChild(this.baseBitmap);
-         }
-      }
-      
-      public function floodFill(param1:Pixel) : void
-      {
-         if(param1.surfaceID == this.floodSurface && param1.color == this.floodColor && param1.colorAlpha == this.floodAlpha)
-         {
-            param1.setColor(this.fillColor,this.fillAlpha);
-            this.propagateFloodFill(param1.gridX - 1,param1.gridY);
-            this.propagateFloodFill(param1.gridX + 1,param1.gridY);
-            this.propagateFloodFill(param1.gridX,param1.gridY - 1);
-            this.propagateFloodFill(param1.gridX,param1.gridY + 1);
-         }
-      }
-      
-      public function cleanup() : void
-      {
-         removeEventListener(MouseEvent.MOUSE_DOWN,this.mouseDown);
-         removeEventListener(MouseEvent.ROLL_OUT,this.mouseOut);
-         Main.stageRef.removeEventListener(MouseEvent.MOUSE_MOVE,this.mouseMove);
-      }
-      
-      public function getPixelAtPoint(param1:Number, param2:Number) : Pixel
-      {
-         if(param1 < 0)
-         {
-            param1 = 0;
-         }
-         if(param2 < 0)
-         {
-            param2 = 0;
-         }
-         var _loc3_:uint = param1 / PIXEL_SCALE;
-         var _loc4_:uint = param2 / PIXEL_SCALE;
-         if(_loc3_ >= this.curViewRect.width)
-         {
-            _loc3_ = this.curViewRect.width - 1;
-         }
-         if(_loc4_ >= this.curViewRect.height)
-         {
-            _loc4_ = this.curViewRect.height - 1;
-         }
-         return this.pixels[_loc4_][_loc3_];
-      }
-      
-      public function transferEditorToLayer() : void
-      {
-         var _loc1_:ByteArray = new ByteArray();
-         this.i = 0;
-         while(this.i < this.curViewRect.height)
-         {
-            this.j = 0;
-            while(this.j < this.curViewRect.width)
-            {
-               this.tempPixel = this.pixels[this.i][this.j];
-               if(this.tempPixel.colorAlpha == 0)
-               {
-                  _loc1_.writeUnsignedInt(0);
-               }
-               else
-               {
-                  _loc1_.writeUnsignedInt(4278190080 | this.tempPixel.color);
-               }
-               ++this.j;
-            }
-            ++this.i;
-         }
-         _loc1_.position = 0;
-         CustomLayer(Main.layerToEdit).customBitmapData.setPixels(this.curViewRect,_loc1_);
-         Main.rootRef.mcPreviewBox.refreshView();
-      }
-      
-      public function hideBase() : void
-      {
-         this.baseBitmap.visible = false;
-      }
-      
-      public function captureUndoLevel() : void
-      {
-         this.undoLog.push(Main.layerToEdit.getBitmapData());
-         if(this.undoLog.length > 20)
-         {
-            this.undoLog.shift();
-         }
-         Main.rootRef.updateUndoButton();
-      }
-      
-      public function undo() : void
-      {
-         if(this.undoLog.length == 0)
-         {
-            trace("no undo levels");
-            return;
-         }
-         CustomLayer(Main.layerToEdit).customBitmapData = this.undoLog[this.undoLog.length - 1].clone();
-         this.undoLog.pop();
-         this.drawView(this.curView);
-         Main.rootRef.mcPreviewBox.refreshView();
-         Main.rootRef.btnUndo.gotoAndPlay(2);
-         Main.rootRef.updateUndoButton();
-      }
-      
-      public function mouseDown(param1:MouseEvent) : void
-      {
-         var _loc2_:Pixel = this.getPixelAtPoint(mouseX,mouseY);
-         this.setPixelsEligibleForColor();
-         Main.stageRef.focus = null;
-         if(Main.curTool == Main.TOOL_ERASER)
-         {
-            this.captureUndoLevel();
-            Main.cursorMode = Main.CURSOR_DRAW;
-            this.fillAlpha = 0;
-            this.fillColor = 0;
-            _loc2_.setColor(this.fillColor,this.fillAlpha);
-            this.transferEditorToLayer();
-            Main.rootRef.mcShiftMessage.visible = true;
-         }
-         else if(Main.curTool == Main.TOOL_PENCIL)
-         {
-            this.captureUndoLevel();
-            Main.cursorMode = Main.CURSOR_DRAW;
-            this.fillAlpha = 1;
-            this.fillColor = Main.rootRef.colorGrabber.actualColor;
-            _loc2_.setColor(this.fillColor,this.fillAlpha);
-            this.transferEditorToLayer();
-            Main.rootRef.mcShiftMessage.visible = true;
-         }
-         else if(Main.curTool == Main.TOOL_BUCKET)
-         {
-            this.captureUndoLevel();
-            this.floodSurface = _loc2_.surfaceID;
-            this.floodColor = _loc2_.color;
-            this.floodAlpha = _loc2_.colorAlpha;
-            this.fillAlpha = 1;
-            this.fillColor = Main.rootRef.colorGrabber.actualColor;
-            this.floodFill(_loc2_);
-            this.transferEditorToLayer();
-         }
-      }
-      
-      public function setPixelsEligibleForColor() : void
-      {
-         this.i = 0;
-         while(this.i < this.curViewRect.height)
-         {
-            this.j = 0;
-            while(this.j < this.curViewRect.width)
-            {
-               this.pixels[this.i][this.j].eligibleForColor = true;
-               ++this.j;
-            }
-            ++this.i;
-         }
-      }
-      
-      public function mouseOut(param1:MouseEvent) : void
-      {
-         Main.rootRef.txtSurfaceName.text = "";
-      }
-      
-      public function showBase() : void
-      {
-         this.baseBitmap.visible = true;
-      }
-      
-      public function propagateFloodFill(param1:int, param2:int) : void
-      {
-         if(param1 >= 0 && param1 < this.curViewRect.width && (param2 >= 0 && param2 < this.curViewRect.height))
-         {
-            this.tempPixel = this.pixels[param2][param1];
-            if(this.tempPixel.eligibleForColor)
-            {
-               this.floodFill(this.tempPixel);
-            }
-         }
-      }
-   }
+      pixelBytes.position = 0;
+      CustomLayer(Main.layerToEdit).customBitmapData.setPixels(curViewRect, pixelBytes);
+      Main.rootRef.mcPreviewBox.refreshView();
+    }
+    
+    public function hideBase():void{baseBitmap.visible = false;}
+    public function showBase():void{baseBitmap.visible = true;}
+    
+    public function cleanup():void
+    {
+      removeEventListener(MouseEvent.MOUSE_DOWN, mouseDown);
+      removeEventListener(MouseEvent.ROLL_OUT, mouseOut);
+      Main.stageRef.removeEventListener(MouseEvent.MOUSE_MOVE, mouseMove);
+    }
+  }
 }

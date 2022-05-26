@@ -1,87 +1,81 @@
-package
+﻿package
 {
-   import flash.display.BitmapData;
-   import flash.geom.Point;
-   import flash.geom.Rectangle;
-   import flash.utils.getDefinitionByName;
-   
-   public class Piece
-   {
+  import flash.display.BitmapData;
+  import flash.geom.Point;
+  import flash.geom.Rectangle;
+  import flash.utils.getDefinitionByName;
+  
+  public class Piece
+  {
+    //instance vars
+    public var id:uint;
+    public var name:String;
+    public var exportName:String;
+    public var subcategory:uint;
+    public var tempSurface:Surface;
+    public var allowedSurfaces:Vector.<Surface>; //vector of surfaces that this piece is allowed to touch. the first one is also the piece's default view
+    public var canMove:Boolean; //whether or not the piece can be moved pixel by pixel
+    public var defaultView:uint;
+    
+    //static id
+    public static var uniqueID:int = -1;
+    
+    public function Piece(inName:String, inSubcategory:uint, inAllowedSurfaces:Array, inCanMove:Boolean=true, inAltDisplayName:String=""):void
+    {
+      id = generateUniqueID();
+      name = inName;
+      subcategory = inSubcategory;
+      canMove = inCanMove;
       
-      public static var uniqueID:int = -1;
-       
+      //derive export name from given name
+      exportName = name.split(" ").join("") + ".png";
       
-      public var canMove:Boolean;
-      
-      public var defaultView:uint;
-      
-      public var name:String;
-      
-      public var allowedSurfaces:Vector.<Surface>;
-      
-      public var tempSurface:Surface;
-      
-      public var id:uint;
-      
-      public var subcategory:uint;
-      
-      public var exportName:String;
-      
-      public function Piece(param1:String, param2:uint, param3:Array, param4:Boolean = true, param5:String = "")
+      //allowed surfaces are passed as an array of surface ids, convert them to actual surface objects in the vector
+      allowedSurfaces = new Vector.<Surface>;
+      for each(var surfaceID:int in inAllowedSurfaces)
       {
-         var _loc6_:int = 0;
-         super();
-         this.id = this.generateUniqueID();
-         this.name = param1;
-         this.subcategory = param2;
-         this.canMove = param4;
-         this.exportName = this.name.split(" ").join("") + ".png";
-         this.allowedSurfaces = new Vector.<Surface>();
-         for each(_loc6_ in param3)
-         {
-            if(_loc6_ != -1)
-            {
-               this.allowedSurfaces.push(Main.getSurface(_loc6_));
-            }
-         }
-         this.defaultView = this.allowedSurfaces[0].viewableFrom;
-         if(param5 != "")
-         {
-            this.name = param5;
-         }
+        //if we find surface id -1, skip (it was used as a placeholder)
+        if(surfaceID == -1) continue;
+        allowedSurfaces.push(Main.getSurface(surfaceID));
       }
       
-      public function generateUniqueID() : int
+      //set default view
+      defaultView = allowedSurfaces[0].viewableFrom;
+      
+      //did they provide an alternative display name?
+      if(inAltDisplayName != "") name = inAltDisplayName;
+    }
+    
+    public function generateUniqueID():int
+    {
+      uniqueID++;
+      return uniqueID;
+    }
+    
+    public function generateBitmapData():BitmapData
+    {
+      var bitmapDataClass:Class = getDefinitionByName(exportName) as Class;
+      return new bitmapDataClass(Main.SKIN_WIDTH, Main.SKIN_HEIGHT);
+    }
+    
+    //pointName is for testing, to see which point fails the test
+    public function surfacesContain(testPoint:Point, pointName:String=""):Boolean
+    {	
+      for each(tempSurface in allowedSurfaces)
       {
-         ++uniqueID;
-         return uniqueID;
+        if(rectContains(tempSurface.sourceRect, testPoint)) return true;
       }
       
-      public function rectContains(param1:Rectangle, param2:*) : Boolean
-      {
-         if(param2.x <= param1.right && param2.x >= param1.left && (param2.y <= param1.bottom && param2.y >= param1.top))
-         {
-            return true;
-         }
-         return false;
-      }
+      //trace("point (" + testPoint.x +","+testPoint.y + ") not found on a surface. " + pointName);
+      return false;
+    }
+    
+    public function rectContains(inRect:Rectangle, inPoint):Boolean
+    {
+      if( (inPoint.x <= inRect.right && inPoint.x >= inRect.left) &&
+        (inPoint.y <= inRect.bottom && inPoint.y >= inRect.top))return true;
       
-      public function surfacesContain(param1:Point, param2:String = "") : Boolean
-      {
-         for each(this.tempSurface in this.allowedSurfaces)
-         {
-            if(this.rectContains(this.tempSurface.sourceRect,param1))
-            {
-               return true;
-            }
-         }
-         return false;
-      }
-      
-      public function generateBitmapData() : BitmapData
-      {
-         var _loc1_:Class = getDefinitionByName(this.exportName) as Class;
-         return Main.convertBmpdTo1_8(new _loc1_(64,32));
-      }
-   }
+      return false;
+    }
+  }
 }
